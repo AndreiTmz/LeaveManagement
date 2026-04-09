@@ -8,13 +8,14 @@
 			private $db;
 			private $link;
 			
-			function dbClass()
+			function __construct()
 			{
-				 $this->host = "localhost";
+				 $this->host = "mysql";
 				 $this->user = "root";
-				 $this->password = "";
-				 $this->db = "gestionare_concedii";
+				 $this->password = "root";
+				 $this->db = "timeoff";
 			}
+
 			function connect()
 			{
 				$this->link=mysqli_connect($this->host,$this->user,$this->password,$this->db);
@@ -22,22 +23,21 @@
 				{	
 					die("Nu am putut stabili conexiunea ".mysqli_connect_error());					
 				}				
-				if(!isset($_SESSION))
-				{
-					session_start();		
-				}
 			}
+
 			function getLink()
 			{
 				return $this->link;
 			}			
+
 			function getDataFromDb($query)
 			{
-				$result = mysqli_query($this->link,$query);
+				$result = mysqli_query($this->link, $query);
 				return $result;
 				
 				echo mysqli_num_rows($result);				
 			}			
+
 			function countRows($res)
 			{
 				return mysqli_num_rows($res);
@@ -47,14 +47,17 @@
 			{
 				return mysqli_fetch_assoc($res);
 			}
+
 			function insertData($query)
 			{
 				return mysqli_query($this->link,$query);
 			}
+
 			function updateData($query)
 			{
 				mysqli_query($this->link,$query);
 			}
+
 			function getUserInformation($userId)
 			{
 				$getUserInfoQuery = "SELECT * FROM angajati WHERE id_angajat='".$userId."'";
@@ -63,6 +66,7 @@
 				
 				return $userInfo;				
 			}
+
 			function getUserId($username)
 			{
 				$findUserIdQuery = "SELECT id_angajat FROM angajati WHERE username='".$username."'";
@@ -81,6 +85,7 @@
 				
 				return $depInfo;
 			}
+
 			//calcul zile ramase neplanificate
 			function remainingDays($userId,$an)
 			{
@@ -94,6 +99,7 @@
 				$countZileRamase = 36 - $countZileRamase;
 				return $countZileRamase;
 			}			
+
 			// numar perioade concediu
 			function countPeriods($userId,$an)
 			{
@@ -199,6 +205,4 @@
 			}
 			
 };
-	
-
 ?>

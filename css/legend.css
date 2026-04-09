@@ -1,4 +1,4 @@
-body{
+body {
 	height:100%;
 	margin:0;
 	background: radial-gradient(#87CEFA,#7B68EE);
@@ -6,11 +6,11 @@ body{
 	background-attachment:fixed;	 
 }
 
-#calendar1 th,td{
+#calendar1 th,td {
 	background-color:#fff;
 }
 
-.info_concedii{
+.info_concedii {
 	background-color:#7FDBFF;	
 	border:2px solid #000;	
 	position:absolute;
@@ -19,17 +19,18 @@ body{
 	top:0;
 	font-size:medium;
 }
-.info_concedii em{
+.info_concedii em {
 	position:absolute;
 	left:1%;
 	top:1%;
 	color:#707070;
 }
 
-.info_concedii a{
+.info_concedii a {
 	text-decoration:none;
 	color:blue;	
 }
+
 .info_concedii a:hover
 {
 	background-color:#000;
@@ -38,11 +39,13 @@ body{
 	transition-duration:0.5s;
 	text-decoration:none;
 }
-.info_concedii button{
+
+.info_concedii button {
 	border:1px solid #000;
 	background-color: #99CC99;
 	color:black;
 }
+
 .info_concedii button:hover
 {
 	background-color:#000;
@@ -51,38 +54,32 @@ body{
 	transition-duration:0.5s;
 }
  
-
-
-#everybody{
+#everybody {
 	border:1px solid #000;
 	background-color: #99CC99;
 	color:black;
 }
 
-#everybody{
+#everybody {
 	width:100px;
 	border-radius:50%;
 }
 
-
-#everybody:hover{
+#everybody:hover {
 	background-color:#000;
 	color:#fff;
 	box-shadow:3px 3px 5px #000;
 	transition-duration:0.5s;
 }
 
-
-.eventsLegend
-{
+.eventsLegend {
 	width:100px;
 	height:15px;
 	border:1px solid #000;
 	border-radius:100%;
 }
 
-.eventsLegend:hover
-{
+.eventsLegend:hover {
 	cursor:pointer;	
 }
 
@@ -91,8 +88,7 @@ body{
   100% { transform: rotate(360deg); }
 }
 
-.loadingInProgress 
-{
+.loadingInProgress {
   margin:auto;
   border: 16px solid #f2a3b5;
   border-radius: 50%;

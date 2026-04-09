@@ -1,24 +1,26 @@
-#err{
+#err {
 	margin-left:35%;
 	font-size:large;
 }
 
-.table td,th{
+.table td,th {
 	background-color:transparent;
 	font-size:medium;
 }
-.table button{
+
+.table button {
 	background-color:#99CC99;
 	color:#000;
 }
-.table button:hover{
+
+.table button:hover {
 	background-color:#000;
 	color:#fff;
 	box-shadow:3px 3px 5px #000;
 	transition-duration:0.5s;
 }
 
-#editInfo p{
+#editInfo p {
 	width:50%;
 	height:auto; 
 	border:2px solid black;
@@ -29,17 +31,19 @@
 	
 }
 
-.no_periods{
+.no_periods {
 	background-color:#7FDBFF;	
 	padding:1%;
 	text-align:center;
 	font-size:medium;	 
  }
- .no_periods a{
+
+ .no_periods a {
 	 text-decoration:none;
 	color:blue;	
  }
- .no_periods a:hover{
+
+ .no_periods a:hover {
 	 background-color:#000;
 	color:#fff;
 	box-shadow:3px 3px 5px #000;

@@ -1,7 +1,5 @@
 <?php
-include ("inc/connect.php");
-	
-	
+	include ("inc/connect.php");
 		
 	$dbConnection = new dbClass();
 	$dbConnection->connect();
@@ -18,15 +16,13 @@ include ("inc/connect.php");
 	$getPeriodInfoRes = $dbConnection->getDataFromDb($getPeriodInfoQuery);
 	$p = 1;
 	
-	
 	$error = false;
 	$errorMsg = "";
 	$done = "";	
 	
-		$data_noua_inceput = isset($_POST['change_begin'])?$_POST['change_begin']:"";
-		$data_noua_sfarsit = isset($_POST['change_end'])?$_POST['change_end']:"";		
-		$data_start_init = isset($_POST['data_inceput_init'])?$_POST['data_inceput_init']:"";
-		
+	$data_noua_inceput = isset($_POST['change_begin'])?$_POST['change_begin']:"";
+	$data_noua_sfarsit = isset($_POST['change_end'])?$_POST['change_end']:"";		
+	$data_start_init = isset($_POST['data_inceput_init'])?$_POST['data_inceput_init']:"";
 		
 	if(isset($_POST['update']))
 	{	
@@ -35,82 +31,78 @@ include ("inc/connect.php");
 		$dDiff = $dStart->diff($dEnd);
 		$nr_nou_zile =  $dDiff->format('%a') + 1; 	
 		
-			
-			//validari
-			if(empty($data_noua_inceput))
-			{
-				$error=true;
-				$errorMsg = "Introduceti data de inceput!";
-			}
-			else if(empty($data_noua_sfarsit))
-			{
-				$error=true;
-				$errorMsg="Introduceti data de sfarsit!";
-			}		
+		//validari
+		if(empty($data_noua_inceput))
+		{
+			$error=true;
+			$errorMsg = "Introduceti data de inceput!";
+		}
+		else if(empty($data_noua_sfarsit))
+		{
+			$error=true;
+			$errorMsg="Introduceti data de sfarsit!";
+		}		
 
-			// verificare incadrare in an curent
-			$start_year = date("Y",strtotime($data_noua_inceput));
-			$end_year = date("Y",strtotime($data_noua_sfarsit));
-			if($start_year != date("Y") || $end_year != date("Y"))
-			{
-				$error = true;
-				$errorMsg = "Puteti selecta numai zile din anul curent!";
-			}
-			
-			//verificare maxim 36 zile 
-			if($_POST['nr_zile_edit']>$countZileRamase + $_POST['nr_zile_init'])
-			{
-				$error = true;
-				$errorMsg = "Ati depasit maximul de 36 de zile!";
-			}			
-			//verificare suprapunere concedii proprii
-			else 
-			{
-					$verifyPeriodsQuery = "SELECT data_inceput, data_sfarsit FROM concedii WHERE id_angajat='".$userId."' AND data_inceput!='".$data_start_init."'";
-					
-					$errVal = $dbConnection -> checkPeriodsOverlap($verifyPeriodsQuery,$data_noua_inceput,$data_noua_sfarsit);
-				if($errVal == -1)
-				{
-					$error = true;
-					$errorMsg = "Aveti deja programat concediu in aceasta perioada!";
-				}
-				else if($errVal == -2)
-				{
-					$error = true;
-					$errorMsg = "Ati planificat deja concediu pentru perioada verii!";
-				}
-			}
-			
-			
-			//verificare minim 1/3 prezenti in departament
-			$data_inceput_compare = strtotime($data_noua_inceput);	//datele preluate din inputuri
-			$data_sfarsit_compare = strtotime($data_noua_sfarsit);
-			
-			$errVal = $dbConnection->checkPeriodAvailableInDepartment($userId,$userInfo['id_departament'],$data_inceput_compare,$data_sfarsit_compare);
-
+		// verificare incadrare in an curent
+		$start_year = date("Y",strtotime($data_noua_inceput));
+		$end_year = date("Y",strtotime($data_noua_sfarsit));
+		if($start_year != date("Y") || $end_year != date("Y"))
+		{
+			$error = true;
+			$errorMsg = "Puteti selecta numai zile din anul curent!";
+		}
+		
+		//verificare maxim 36 zile 
+		if($_POST['nr_zile_edit']>$countZileRamase + $_POST['nr_zile_init'])
+		{
+			$error = true;
+			$errorMsg = "Ati depasit maximul de 36 de zile!";
+		}			
+		//verificare suprapunere concedii proprii
+		else 
+		{
+				$verifyPeriodsQuery = "SELECT data_inceput, data_sfarsit FROM concedii WHERE id_angajat='".$userId."' AND data_inceput!='".$data_start_init."'";
+				
+				$errVal = $dbConnection -> checkPeriodsOverlap($verifyPeriodsQuery,$data_noua_inceput,$data_noua_sfarsit);
 			if($errVal == -1)
 			{
 				$error = true;
-				$errorMsg = "Nu sunt disponibile concedii in aceasta perioada pentru departamentul dv.";
-			}		
+				$errorMsg = "Aveti deja programat concediu in aceasta perioada!";
+			}
+			else if($errVal == -2)
+			{
+				$error = true;
+				$errorMsg = "Ati planificat deja concediu pentru perioada verii!";
+			}
+		}
 			
-			//daca nu sunt erori, se actualizeaza datele
-			if(!$error)
-			{			
-				$done = "Modificare efectuata cu succes " . " <a href='editare.php'> Actualizeaza tabelul </a>";
-				$updatePeriodQuery = "UPDATE concedii SET data_inceput = '$data_noua_inceput',
-				data_sfarsit = '$data_noua_sfarsit',nr_zile = '$nr_nou_zile'
-				WHERE id_angajat='$userId' AND data_inceput='$data_start_init'";
-				$dbConnection->updateData($updatePeriodQuery);			
-			}									
+			
+		//verificare minim 1/3 prezenti in departament
+		$data_inceput_compare = strtotime($data_noua_inceput);	//datele preluate din inputuri
+		$data_sfarsit_compare = strtotime($data_noua_sfarsit);
+		
+		$errVal = $dbConnection->checkPeriodAvailableInDepartment($userId,$userInfo['id_departament'],$data_inceput_compare,$data_sfarsit_compare);
+
+		if($errVal == -1)
+		{
+			$error = true;
+			$errorMsg = "Nu sunt disponibile concedii in aceasta perioada pentru departamentul dv.";
+		}		
+		
+		//daca nu sunt erori, se actualizeaza datele
+		if(!$error)
+		{			
+			$done = "Modificare efectuata cu succes " . " <a href='editare.php'> Actualizeaza tabelul </a>";
+			$updatePeriodQuery = "UPDATE concedii SET data_inceput = '$data_noua_inceput',
+			data_sfarsit = '$data_noua_sfarsit',nr_zile = '$nr_nou_zile'
+			WHERE id_angajat='$userId' AND data_inceput='$data_start_init'";
+			$dbConnection->updateData($updatePeriodQuery);			
+		}									
 	}
+?>
 	
-	
-	?>
-	
-	
-	<!DOCTYPE HTML>
-	<html>
+<!DOCTYPE HTML>
+<html>
 	<head>
 		<title>Editare perioade</title>
 		 <!-- Latest compiled and minified CSS -->
@@ -128,23 +120,20 @@ include ("inc/connect.php");
 		
 	</head>
 	<body body="setDatesForUpdate()">
-	
-				<div class="container-fluid">	
-					<h2>Editare perioade <?php echo $userInfo['nume'] . ' '  . $userInfo['prenume']; ?> </h2>
-					
-					<div class="info_concedii">
-						<em> Info/optiuni </em>
-						Nr. zile neplanificate in anul curent: <?php echo $countZileRamase; ?>  /
-						<a href = "concedii.php"> Adauga inca o perioada </a>  /
-						<a href = "vizualizare.php">  Inapoi la vizualizare concedii </a>	/	
-					<a href="deconectare.php"> <button> Deconectare </button> </a>
-					</div>	
-				</div>
-		
-		
+		<div class="container-fluid">	
+			<h2>Editare perioade <?php echo $userInfo['nume'] . ' '  . $userInfo['prenume']; ?> </h2>
+			
+			<div class="info_concedii">
+				<em> Info/optiuni </em>
+				Nr. zile neplanificate in anul curent: <?php echo $countZileRamase; ?>  /
+				<a href = "concedii.php"> Adauga inca o perioada </a>  /
+				<a href = "vizualizare.php">  Inapoi la vizualizare concedii </a>	/	
+			<a href="deconectare.php"> <button> Deconectare </button> </a>
+			</div>	
+		</div>
 		<br><br>
-	<div class="container-fluid">
-	<table class="table">
+		<div class="container-fluid">
+			<table class="table">
 				<tr>
 					<th>Nr.perioada </th>
 					<th>Data inceput</th>
@@ -153,38 +142,35 @@ include ("inc/connect.php");
 					<th>Editare</th>
 					<th>Anulare</th>
 				</tr>
-	<?php
-	
-	
+
+<?php
 	while($periodInfo = $dbConnection->fetch($getPeriodInfoRes))
 	{
-	?>			
-				<tr>
-					<td> <?php echo $p; ?> </td>
-					<td> <?php echo $periodInfo['data_inceput']; ?> </td>
-					<td> <?php echo $periodInfo['data_sfarsit']; ?> </td>
-					<td> <?php echo $periodInfo['nr_zile']; ?> </td>
-					<td> 	
-						<button onclick=
-						"update( <?php echo $p; ?>, 
-						<?php echo strtotime($periodInfo['data_inceput']);?>, 
-						<?php echo strtotime($periodInfo['data_sfarsit']); ?> ,
-						<?php echo $periodInfo['nr_zile']; ?>)"> Modifica perioada</button>	
-					</td>
-					<td>
-						<a href="sterge_perioada.php?d=<?php echo $periodInfo['data_inceput']; ?>"><button> Anuleaza perioada </button></a>
-					</td>
-				</tr>
+?>			
+		<tr>
+			<td> <?php echo $p; ?> </td>
+			<td> <?php echo $periodInfo['data_inceput']; ?> </td>
+			<td> <?php echo $periodInfo['data_sfarsit']; ?> </td>
+			<td> <?php echo $periodInfo['nr_zile']; ?> </td>
+			<td> 	
+				<button onclick=
+				"update( <?php echo $p; ?>, 
+				<?php echo strtotime($periodInfo['data_inceput']);?>, 
+				<?php echo strtotime($periodInfo['data_sfarsit']); ?> ,
+				<?php echo $periodInfo['nr_zile']; ?>)"> Modifica perioada</button>	
+			</td>
+			<td>
+				<a href="sterge_perioada.php?d=<?php echo $periodInfo['data_inceput']; ?>"><button> Anuleaza perioada </button></a>
+			</td>
+		</tr>
 			
-			
-		
 <?php
 		$p++;
 	}
 	if($p == 1) 
 		echo "<div class='no_periods'> Nu aveti planificat niciun concediu pentru perioada urmatoare! ( <a href='concedii.php'> Adauga perioada </a>) </div>";
 ?>
-	</table>
+		</table>
 	</div>
 	<br> <br>
 	
@@ -215,18 +201,14 @@ include ("inc/connect.php");
 				<input id="change_hidden" name="data_inceput_init" type="date" hidden readonly />
 				<input id="nr_zile_edit" type = "text" name="nr_zile_edit" hidden readonly />
 				<input id="nr_zile_init" type = "text" name="nr_zile_init" hidden />				
-				
 		</form>
 	</div> <br> <br> <br>
-					<div id="editInfo">
-						<p>  						
-						Click pe butonul "Modifica perioada" in dreptul perioadei pe care doriti sa o modificati						
-						</p>
-					</div>
-	<br>
-	
+	<div id="editInfo">
+		<p>  						
+			Click pe butonul "Modifica perioada" in dreptul perioadei pe care doriti sa o modificati						
+		</p>
+	</div>
+	<br />
 	<span id="err" class="help-inline text-danger" > <b> <?php if($error==true) echo $errorMsg; else echo $done; ?> </b>  </span>  <br>
-	
-	
 </body>
 </html>

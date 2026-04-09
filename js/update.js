@@ -91,16 +91,12 @@ function setEndDatesForUpdate()
 		end.value = startDateString;
 		calculNrZileEdit();
 	}
-	
 }
-
 
 function calculNrZileEdit()
 {
-	
 	var begin = document.getElementById("change_begin");
 	var end = document.getElementById("change_end");
-	
 	
 	var hiddenInput = document.getElementById("nr_zile_edit");	
 	var beginDate = new Date(begin.value);
@@ -120,7 +116,4 @@ function calculNrZileEdit()
 	{
 		hiddenInput.value = 0;
 	}
-	
-	
-	
 }

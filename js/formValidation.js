@@ -13,8 +13,6 @@ function setDates()
 	
 	end.setAttribute('min',tomorrow);	
 	begin.addEventListener('change',setEndDates);
-	
-	
 }
 
 function setEndDates()
@@ -64,12 +62,7 @@ function setEndDates()
 		end.value = startDateString;
 		calculNrZile();
 	}
-	
-	
 }
-
-
-
 
 function calculNrZile()
 {
@@ -97,10 +90,7 @@ function calculNrZile()
 	{
 		nrZileTextInput.innerHTML = "-";
 		hiddenInput.value = 0;
-	}
-	
-	
-	
+	}	
 }
 
 function zileRamase()
