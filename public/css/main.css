@@ -1,0 +1,58 @@
+:root {
+    --background:#FFDBBB;
+    --surface:#FFFFFF;
+    --primary:#8A7157;
+    --primary-hover:#715A46;
+    --border:#DDD7CF;
+    --text:#2E2E2E;
+    --danger: #B94A48;
+    --shadow: 0 12px 30px rgba(0,0,0,.08);
+    --radius: 12px;
+}
+
+body {
+    min-height:100vh;
+    margin: 0;
+    background: var(--background);
+}
+
+.btn {
+    border-radius: var(--radius);
+}
+
+.form-control {
+    border-radius: var(--radius);
+}
+
+.card {
+    border-radius: var(--radius);
+}
+
+.app-header {
+    background:#EBC9A6;
+    box-shadow:var(--shadow);
+    padding:20px 0;
+}
+
+.app-header-content {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.error-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.error-card a {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.error-card a:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+}

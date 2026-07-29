@@ -1,0 +1,17 @@
+{
+    "name": "andreit/leave-management",
+    "description": "Leave/Time off management system",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "LeaveManagement\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Andrei T"
+        }
+    ],
+    "require": {}
+}

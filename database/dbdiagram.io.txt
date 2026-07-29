@@ -1,0 +1,49 @@
+Table employees {
+  id int [not null, PK]
+  first_name varchar(50) [not null] 
+  last_name varchar(50) [not null]
+  email varchar(100) [not null]
+  username varchar(25) [not null, unique]
+  password_hash varchar(255) [not null]
+  position_id int [not null, ref: > positions.id]
+  department_id int [not null, ref: > departments.id]
+  manager_id int [ref: - employees.id]
+  created_at datetime [not null]
+  updated_at datetime
+}
+
+Table departments {
+  id int [not null, PK]
+  name varchar(25) [not null, unique]
+}
+
+Table leaves {
+  id int [not null, PK]
+  start_date date [not null]
+  end_date date [not null]
+  leave_type_id int [not null, ref: > leave_types.id]
+  status varchar(25) [not null]
+  employee_id int [not null, ref: > employees.id]
+  created_by_id int [not null, ref: > employees.id]
+  approved_by_id int [ref: > employees.id]
+  replacement_id int [ref: - employees.id]
+  created_at datetime [not null]
+  updated_at datetime
+}
+
+Table leave_types {
+  id int [not null, PK]
+  name varchar(25) [not null, unique]
+}
+
+Table positions {
+  id int [not null, PK]
+  name varchar(50) [not null, unique]
+}
+
+Table leave_rules {
+  position_id int [pk, not null, ref: > positions.id]
+  leave_type_id int [pk, not null, ref: > leave_types.id]
+  max_days_per_year int [not null]
+  replacement_required bool [not null]
+}
