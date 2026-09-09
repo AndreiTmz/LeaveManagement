@@ -40,6 +40,11 @@ class LeaveService
         return $colors[$departmentId] ?? '#000000'; // Default to black if not found
     }
 
+    public function getLeaveTypes(): array
+    {
+        return $this->leaveRepository->fetchLeaveTypes();
+    }
+
     public function requestLeave(int $employeeId, string $startDate, string $endDate): bool
     {
         echo "Requesting leave for employee ID: $employeeId from $startDate to $endDate";

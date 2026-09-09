@@ -23,7 +23,7 @@ INSERT INTO positions (id, name) VALUES
 
 -- LEAVE TYPES
 INSERT INTO leave_types (id, name) VALUES
-(1, 'Vacation'),
+(1, 'Annual Leave'),
 (2, 'Sick Leave'),
 (3, 'Unpaid Leave');
 

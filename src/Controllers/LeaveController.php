@@ -13,7 +13,9 @@ class LeaveController extends BaseController
     {
         $this->requireAuth();
         $this->view('leaves/request', [
-            'title' => 'Request Leave'
+            'title' => 'Request Leave',
+            'styles' => ['/css/forms.css'],
+            'leaveTypes' => $this->leaveService->getLeaveTypes()
         ]);
     }
 
@@ -24,16 +26,15 @@ class LeaveController extends BaseController
         // Validate and process the leave request
         $startDate = $_POST['start_date'] ?? '';
         $endDate = $_POST['end_date'] ?? '';
-        $reason = $_POST['reason'] ?? '';
 
         // Basic validation
-        if (empty($startDate) || empty($endDate) || empty($reason)) {
-            $this->view('leaves/request-leave', [
+        if (empty($startDate) || empty($endDate)) {
+            $this->view('leaves/request', [
                 'title' => 'Request Leave',
+                'styles' => ['/css/forms.css'],
                 'errorMessage' => 'All fields are required.',
                 'startDate' => $startDate,
-                'endDate' => $endDate,
-                'reason' => $reason,
+                'endDate' => $endDate
             ]);
             return;
         }
@@ -43,12 +44,12 @@ class LeaveController extends BaseController
             header('Location: /calendar');
             exit;
         } else {
-            $this->view('leaves/request-leave', [
+            $this->view('leaves/request', [
                 'title' => 'Request Leave',
+                'styles' => ['/css/forms.css'],
                 'errorMessage' => 'Failed to submit leave request. Please try again.',
                 'startDate' => $startDate,
-                'endDate' => $endDate,
-                'reason' => $reason,
+                'endDate' => $endDate
             ]);
         }
     }

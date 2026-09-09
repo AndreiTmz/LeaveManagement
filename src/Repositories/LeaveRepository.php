@@ -19,4 +19,10 @@ class LeaveRepository
 
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
+
+    public function fetchLeaveTypes(): array
+    {
+        $stmt = $this->pdo->query("SELECT * FROM leave_types");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

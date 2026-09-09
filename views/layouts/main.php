@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <?php require __DIR__ . '/partials/head.php'; ?>
+    
     <body>
         <header class="app-header">
             <div class="container app-header-content">
