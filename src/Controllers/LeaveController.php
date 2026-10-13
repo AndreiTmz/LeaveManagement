@@ -26,30 +26,34 @@ class LeaveController extends BaseController
         // Validate and process the leave request
         $startDate = $_POST['start_date'] ?? '';
         $endDate = $_POST['end_date'] ?? '';
-
-        // Basic validation
-        if (empty($startDate) || empty($endDate)) {
-            $this->view('leaves/request', [
-                'title' => 'Request Leave',
-                'styles' => ['/css/forms.css'],
-                'errorMessage' => 'All fields are required.',
-                'startDate' => $startDate,
-                'endDate' => $endDate
-            ]);
-            return;
-        }
+        $leaveTypeId = filter_var($_POST['leave_type'] ?? null, FILTER_VALIDATE_INT);
 
         // Attempt to create the leave request
-        if ($this->leaveService->requestLeave($_SESSION['user_id'], $startDate, $endDate)) {
+        try {
+            $created = $this->leaveService->requestLeave(
+                (int) $_SESSION['user_id'],
+                $leaveTypeId === false ? 0 : (int) $leaveTypeId,
+                $startDate,
+                $endDate
+            );
+            $errorMessage = '';
+        } catch (\InvalidArgumentException $exception) {
+            $created = false;
+            $errorMessage = $exception->getMessage();
+        }
+
+        if ($created) {
             header('Location: /calendar');
             exit;
         } else {
             $this->view('leaves/request', [
                 'title' => 'Request Leave',
                 'styles' => ['/css/forms.css'],
-                'errorMessage' => 'Failed to submit leave request. Please try again.',
+                'leaveTypes' => $this->leaveService->getLeaveTypes(),
+                'errorMessage' => $errorMessage ?: 'Failed to submit leave request. Please try again.',
                 'startDate' => $startDate,
-                'endDate' => $endDate
+                'endDate' => $endDate,
+                'selectedLeaveType' => $leaveTypeId === false ? '' : $leaveTypeId
             ]);
         }
     }

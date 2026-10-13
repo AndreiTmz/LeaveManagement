@@ -2,6 +2,7 @@
 
 namespace LeaveManagement\Services;
 
+use LeaveManagement\Models\RemainingLeaveInfo;
 use LeaveManagement\Repositories\LeaveRepository;
 
 class LeaveService
@@ -10,16 +11,20 @@ class LeaveService
     {
     }
 
-    public function getAllApprovedLeaves(): array 
+    public function getCalendarLeaves(): array
     {
-        $leaves = $this->leaveRepository->fetchAllApproved();
+        $leaves = $this->leaveRepository->fetchCalendarLeaves();
         $events = [];
 
         foreach ($leaves as $leave) {
             $events[] = [
                 'title' => $leave->first_name . ' ' . $leave->last_name, // 'John Doe'
                 'start' => $leave->start_date,    // '2026-07-10'
-                'end'   => $leave->end_date,      // '2026-07-15'
+                'end'   => (new \DateTimeImmutable($leave->end_date))->modify('+1 day')->format('Y-m-d'),
+                'allDay' => true,
+                'status' => $leave->status,
+                'leave_type' => $leave->leave_type,
+                'classNames' => $leave->status === 'pending' ? ['pending-leave-request'] : [],
                 'backgroundColor' => $this->getDepartmentColor($leave->department_id)
             ];
         }
@@ -45,23 +50,58 @@ class LeaveService
         return $this->leaveRepository->fetchLeaveTypes();
     }
 
-    public function requestLeave(int $employeeId, string $startDate, string $endDate): bool
+    public function getRemainingLeaveDays(int $employeeId) : array
     {
-        echo "Requesting leave for employee ID: $employeeId from $startDate to $endDate";
-        return true;
-        //todo: check this generated code and implement missing logic:
-        // // Validate dates
-        // if (strtotime($startDate) > strtotime($endDate)) {
-        //     throw new \InvalidArgumentException("Start date cannot be after end date.");
-        // }
+        $remainingDays = $this->leaveRepository->fetchRemainingLeaveDays($employeeId);
+        return array_map([RemainingLeaveInfo::class, 'fromArray'], $remainingDays);
+    }
 
-        // // Check for overlapping leaves
-        // $overlappingLeaves = $this->leaveRepository->findOverlappingLeaves($employeeId, $startDate, $endDate);
-        // if (!empty($overlappingLeaves)) {
-        //     throw new \Exception("You already have a leave request that overlaps with these dates.");
-        // }
+    public function getEmployeeRequestsForCurrentYear(int $employeeId): array
+    {
+        $requests = $this->leaveRepository->fetchEmployeeRequestsForYear($employeeId, (int) date('Y'));
 
-        // // Create the leave request
-        // return $this->leaveRepository->createLeaveRequest($employeeId, $startDate, $endDate);
+        foreach ($requests as $request) {
+            $request->working_days = $this->countWorkingDays($request->start_date, $request->end_date);
+        }
+
+        return $requests;
+    }
+
+    private function countWorkingDays(string $startDate, string $endDate): int
+    {
+        $start = new \DateTimeImmutable($startDate);
+        $end = new \DateTimeImmutable($endDate);
+        if ($end < $start) {
+            return 0;
+        }
+
+        $workingDays = 0;
+        for ($day = $start; $day <= $end; $day = $day->modify('+1 day')) {
+            if ((int) $day->format('N') < 6) {
+                $workingDays++;
+            }
+        }
+
+        return $workingDays;
+    }
+
+    public function requestLeave(int $employeeId, int $leaveTypeId, string $startDate, string $endDate): bool
+    {
+        $start = \DateTimeImmutable::createFromFormat('!Y-m-d', $startDate);
+        $end = \DateTimeImmutable::createFromFormat('!Y-m-d', $endDate);
+
+        if (!$start || $start->format('Y-m-d') !== $startDate || !$end || $end->format('Y-m-d') !== $endDate) {
+            throw new \InvalidArgumentException('Enter valid start and end dates.');
+        }
+
+        if ($end < $start) {
+            throw new \InvalidArgumentException('End date cannot be before the start date.');
+        }
+
+        if ($leaveTypeId < 1) {
+            throw new \InvalidArgumentException('Select a leave type.');
+        }
+
+        return $this->leaveRepository->createLeaveRequest($employeeId, $leaveTypeId, $startDate, $endDate);
     }
 }

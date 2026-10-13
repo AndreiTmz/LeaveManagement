@@ -15,8 +15,8 @@ class DashboardController extends BaseController
         $this->view('dashboard/dashboard', [
             'title' => 'Dashboard',
             'styles' => ['/css/dashboard.css'],
-            'remainingLeave' => "12 - need to get this from db",
-            'pendingRequests' => "3 - need to get this from db"
+            'remainingLeave' => $this->leaveService->getRemainingLeaveDays((int) $_SESSION['user_id']),
+            'leaveRequests' => $this->leaveService->getEmployeeRequestsForCurrentYear((int) $_SESSION['user_id'])
         ]);
     }
 
@@ -24,8 +24,7 @@ class DashboardController extends BaseController
     {
         $this->requireAuth();
 
-        // Fetch all approved leaves from LeaveService
-        $events = $this->leaveService->getAllApprovedLeaves();
+        $events = $this->leaveService->getCalendarLeaves();
         
         // Output as JSON for FullCalendar
         header('Content-Type: application/json');

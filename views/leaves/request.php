@@ -1,5 +1,12 @@
 <div class="form-page">
-    <div class="form-card">
+    <div class="form-card-wrapper">
+        <a class="form-back-link" href="/calendar" aria-label="Back to calendar" title="Back to calendar">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5"></path>
+                <path d="m12 19-7-7 7-7"></path>
+            </svg>
+        </a>
+        <div class="form-card">
         <h2 class="text-center mb-4">
             Request Leave
         </h2>
@@ -42,5 +49,6 @@
                 Request leave
             </button>
         </form>
+        </div>
     </div>
 </div>

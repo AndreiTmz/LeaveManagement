@@ -62,14 +62,14 @@ return function ($container, $config) {
         );
     });
 
-    $container->set(DashboardController::class, function ($c) {
-        return new DashboardController(
+    $container->set(LeaveController::class, function ($c) {
+        return new LeaveController(
             $c->get(LeaveService::class)
         );
     });
 
-    $container->set(LeaveController::class, function ($c) {
-        return new LeaveController(
+    $container->set(DashboardController::class, function ($c) {
+        return new DashboardController(
             $c->get(LeaveService::class)
         );
     });
