@@ -156,6 +156,21 @@ class LeaveRepository
                 throw new \InvalidArgumentException('Your department could not be found.');
             }
 
+            $overlap = $this->pdo->prepare('SELECT 1
+                FROM leaves
+                WHERE employee_id = :employee_id
+                    AND start_date <= :end_date
+                    AND end_date >= :start_date
+                LIMIT 1');
+            $overlap->execute([
+                'employee_id' => $employeeId,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+            ]);
+            if ($overlap->fetchColumn()) {
+                throw new \InvalidArgumentException('You already have a leave request for some or all of the selected dates.');
+            }
+
             $rule = $this->fetchLeaveRule($requester['position_id'], $leaveTypeId);
             if (!$rule) {
                 throw new \InvalidArgumentException('Select a valid leave type.');

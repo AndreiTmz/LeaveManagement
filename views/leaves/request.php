@@ -93,7 +93,7 @@
                         return;
                     }
                     if (!required) {
-                        replacementHelp.textContent = 'A replacement is not required for this leave type.';
+                        replacementHelp.textContent = '';
                         return;
                     }
                     if (!startDate.value || !endDate.value || startDate.value > endDate.value) {
