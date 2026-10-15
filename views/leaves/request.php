@@ -79,6 +79,125 @@
                 ) ?>;
                 let latestRequest = 0;
 
+                function initializeWeekdayPicker(input) {
+                    input.type = 'text';
+                    input.readOnly = true;
+                    input.setAttribute('aria-haspopup', 'dialog');
+                    input.setAttribute('aria-expanded', 'false');
+                    input.setAttribute('autocomplete', 'off');
+
+                    const picker = document.createElement('div');
+                    picker.className = 'weekday-picker';
+                    picker.hidden = true;
+                    picker.setAttribute('role', 'dialog');
+                    picker.setAttribute('aria-label', 'Choose a weekday');
+                    input.insertAdjacentElement('afterend', picker);
+
+                    let visibleMonth = input.value
+                        ? new Date(input.value + 'T00:00:00')
+                        : new Date();
+                    visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1);
+
+                    function closePicker() {
+                        picker.hidden = true;
+                        input.setAttribute('aria-expanded', 'false');
+                    }
+
+                    function renderPicker() {
+                        picker.replaceChildren();
+
+                        const header = document.createElement('div');
+                        header.className = 'weekday-picker-header';
+                        const previous = document.createElement('button');
+                        previous.type = 'button';
+                        previous.textContent = 'Previous';
+                        previous.setAttribute('aria-label', 'Previous month');
+                        previous.addEventListener('click', () => {
+                            visibleMonth.setMonth(visibleMonth.getMonth() - 1);
+                            renderPicker();
+                        });
+                        const title = document.createElement('strong');
+                        title.textContent = visibleMonth.toLocaleDateString(undefined, {
+                            month: 'long',
+                            year: 'numeric'
+                        });
+                        const next = document.createElement('button');
+                        next.type = 'button';
+                        next.textContent = 'Next';
+                        next.setAttribute('aria-label', 'Next month');
+                        next.addEventListener('click', () => {
+                            visibleMonth.setMonth(visibleMonth.getMonth() + 1);
+                            renderPicker();
+                        });
+                        header.append(previous, title, next);
+                        picker.append(header);
+
+                        const grid = document.createElement('div');
+                        grid.className = 'weekday-picker-grid';
+                        for (const dayName of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']) {
+                            const dayLabel = document.createElement('span');
+                            dayLabel.className = 'weekday-picker-label';
+                            dayLabel.textContent = dayName;
+                            grid.append(dayLabel);
+                        }
+
+                        const firstWeekday = visibleMonth.getDay();
+                        for (let blank = 0; blank < firstWeekday; blank++) {
+                            grid.append(document.createElement('span'));
+                        }
+                        const daysInMonth = new Date(
+                            visibleMonth.getFullYear(),
+                            visibleMonth.getMonth() + 1,
+                            0
+                        ).getDate();
+                        for (let day = 1; day <= daysInMonth; day++) {
+                            const date = new Date(
+                                visibleMonth.getFullYear(),
+                                visibleMonth.getMonth(),
+                                day
+                            );
+                            const dateButton = document.createElement('button');
+                            dateButton.type = 'button';
+                            dateButton.textContent = String(day);
+                            dateButton.disabled = date.getDay() === 0 || date.getDay() === 6;
+                            dateButton.setAttribute('aria-label', date.toLocaleDateString());
+                            dateButton.addEventListener('click', () => {
+                                input.value = [
+                                    date.getFullYear(),
+                                    String(date.getMonth() + 1).padStart(2, '0'),
+                                    String(date.getDate()).padStart(2, '0')
+                                ].join('-');
+                                closePicker();
+                                input.dispatchEvent(new Event('change', { bubbles: true }));
+                            });
+                            grid.append(dateButton);
+                        }
+                        picker.append(grid);
+                    }
+
+                    input.addEventListener('click', () => {
+                        if (picker.hidden) {
+                            const selectedDate = input.value ? new Date(input.value + 'T00:00:00') : null;
+                            visibleMonth = selectedDate && !Number.isNaN(selectedDate.getTime())
+                                ? new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1)
+                                : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+                            renderPicker();
+                            picker.hidden = false;
+                            input.setAttribute('aria-expanded', 'true');
+                        } else {
+                            closePicker();
+                        }
+                    });
+                    input.addEventListener('keydown', event => {
+                        if (event.key === 'Escape') {
+                            closePicker();
+                        }
+                    });
+                }
+
+                initializeWeekdayPicker(startDate);
+                initializeWeekdayPicker(endDate);
+
                 async function refreshReplacements() {
                     const requestId = ++latestRequest;
                     const selectedOption = leaveType.options[leaveType.selectedIndex];

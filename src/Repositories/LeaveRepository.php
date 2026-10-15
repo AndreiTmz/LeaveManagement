@@ -35,31 +35,50 @@ class LeaveRepository
 
     public function fetchRemainingLeaveDays(int $employeeId): array
     {
-        $stmt = $this->pdo->prepare("SELECT
-                lt.name AS leave_type,
-                GREATEST(
-                    lr.max_days_per_year - COALESCE(SUM(
-                        DATEDIFF(
-                            LEAST(l.end_date, DATE_SUB(MAKEDATE(YEAR(CURDATE()) + 1, 1), INTERVAL 1 DAY)),
-                            GREATEST(l.start_date, MAKEDATE(YEAR(CURDATE()), 1))
-                        ) + 1
-                    ), 0),
-                    0
-                ) AS remaining_days
+        $stmt = $this->pdo->prepare("SELECT lt.id, lt.name AS leave_type, lr.max_days_per_year
             FROM employees e
             JOIN leave_rules lr ON lr.position_id = e.position_id
             JOIN leave_types lt ON lt.id = lr.leave_type_id
-            LEFT JOIN leaves l ON l.employee_id = e.id
-                AND l.leave_type_id = lr.leave_type_id
-                AND l.status = 'approved'
-                AND l.start_date < MAKEDATE(YEAR(CURDATE()) + 1, 1)
-                AND l.end_date >= MAKEDATE(YEAR(CURDATE()), 1)
             WHERE e.id = :employee_id
-            GROUP BY lt.id, lt.name, lr.max_days_per_year
             ORDER BY lt.id");
         $stmt->execute(['employee_id' => $employeeId]);
+        $leaveTypes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $year = (int) date('Y');
+        $yearStart = sprintf('%04d-01-01', $year);
+        $yearEnd = sprintf('%04d-12-31', $year);
+        $leaves = $this->pdo->prepare("SELECT leave_type_id, start_date, end_date
+            FROM leaves
+            WHERE employee_id = :employee_id
+                AND status = 'approved'
+                AND start_date <= :year_end
+                AND end_date >= :year_start");
+        $leaves->execute([
+            'employee_id' => $employeeId,
+            'year_start' => $yearStart,
+            'year_end' => $yearEnd,
+        ]);
+
+        $usedDays = [];
+        foreach ($leaves->fetchAll(PDO::FETCH_ASSOC) as $leave) {
+            $leaveStart = max($leave['start_date'], $yearStart);
+            $leaveEnd = min($leave['end_date'], $yearEnd);
+            $leaveTypeId = (int) $leave['leave_type_id'];
+            $usedDays[$leaveTypeId] = ($usedDays[$leaveTypeId] ?? 0)
+                + $this->countWorkingDays($leaveStart, $leaveEnd);
+        }
+
+        return array_map(static function (array $leaveType) use ($usedDays): array {
+            $leaveTypeId = (int) $leaveType['id'];
+
+            return [
+                'leave_type' => $leaveType['leave_type'],
+                'remaining_days' => max(
+                    0,
+                    (int) $leaveType['max_days_per_year'] - ($usedDays[$leaveTypeId] ?? 0)
+                ),
+            ];
+        }, $leaveTypes);
     }
 
     public function fetchEmployeeRequestsForYear(int $employeeId, int $year): array
@@ -80,7 +99,7 @@ class LeaveRepository
                     (l.created_at >= :created_year_start AND l.created_at < :created_next_year_start)
                     OR (l.start_date < :leave_next_year_start AND l.end_date >= :leave_year_start)
                 )
-            ORDER BY l.created_at DESC, l.id DESC");
+            ORDER BY l.start_date ASC, l.id ASC");
         $stmt->execute([
             'employee_id' => $employeeId,
             'created_year_start' => $yearStart,
@@ -178,9 +197,7 @@ class LeaveRepository
 
             $yearStart = sprintf('%04d-01-01', $year);
             $yearEnd = sprintf('%04d-12-31', $year);
-            $usage = $this->pdo->prepare("SELECT COALESCE(SUM(
-                    DATEDIFF(LEAST(end_date, :year_end), GREATEST(start_date, :year_start)) + 1
-                ), 0)
+            $usage = $this->pdo->prepare("SELECT start_date, end_date
                 FROM leaves
                 WHERE employee_id = :employee_id
                     AND leave_type_id = :leave_type_id
@@ -188,20 +205,25 @@ class LeaveRepository
                     AND start_date <= :overlap_end
                     AND end_date >= :overlap_start");
             $usage->execute([
-                'year_end' => $yearEnd,
-                'year_start' => $yearStart,
                 'employee_id' => $employeeId,
                 'leave_type_id' => $leaveTypeId,
                 'overlap_end' => $yearEnd,
                 'overlap_start' => $yearStart,
             ]);
+            $usedDays = 0;
+            foreach ($usage->fetchAll(PDO::FETCH_ASSOC) as $leave) {
+                $usedDays += $this->countWorkingDays(
+                    max($leave['start_date'], $yearStart),
+                    min($leave['end_date'], $yearEnd)
+                );
+            }
 
             $requestedStart = max($startDate, $yearStart);
             $requestedEnd = min($endDate, $yearEnd);
             $requestedDays = $requestedStart <= $requestedEnd
-                ? (new \DateTimeImmutable($requestedStart))->diff(new \DateTimeImmutable($requestedEnd))->days + 1
+                ? $this->countWorkingDays($requestedStart, $requestedEnd)
                 : 0;
-            if ((int) $usage->fetchColumn() + $requestedDays > (int) $rule['max_days_per_year']) {
+            if ($usedDays + $requestedDays > (int) $rule['max_days_per_year']) {
                 throw new \InvalidArgumentException('You do not have enough remaining leave days for this leave type this calendar year.');
             }
 
@@ -269,6 +291,21 @@ class LeaveRepository
             'department_id' => (int) $employee['department_id'],
             'position_id' => (int) $employee['position_id'],
         ];
+    }
+
+    private function countWorkingDays(string $startDate, string $endDate): int
+    {
+        $start = new \DateTimeImmutable($startDate);
+        $end = new \DateTimeImmutable($endDate);
+        $workingDays = 0;
+
+        for ($day = $start; $day <= $end; $day = $day->modify('+1 day')) {
+            if ((int) $day->format('N') < 6) {
+                $workingDays++;
+            }
+        }
+
+        return $workingDays;
     }
 
     private function fetchLeaveRule(int $positionId, int $leaveTypeId): ?array

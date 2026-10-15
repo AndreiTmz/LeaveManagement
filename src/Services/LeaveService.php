@@ -124,6 +124,10 @@ class LeaveService
             throw new \InvalidArgumentException('End date cannot be before the start date.');
         }
 
+        if ((int) $start->format('N') > 5 || (int) $end->format('N') > 5) {
+            throw new \InvalidArgumentException('Start and end dates must be weekdays.');
+        }
+
         if ($leaveTypeId < 1) {
             throw new \InvalidArgumentException('Select a leave type.');
         }

@@ -57,6 +57,56 @@
     box-shadow:0 0 0 .2rem rgba(138,113,87,.2);
 }
 
+.weekday-picker {
+    margin-top:8px;
+    padding:12px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface);
+}
+
+.weekday-picker-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin-bottom:8px;
+}
+
+.weekday-picker-header button,
+.weekday-picker-grid button {
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:var(--surface);
+    color:var(--text);
+    padding:4px 8px;
+}
+
+.weekday-picker-grid {
+    display:grid;
+    grid-template-columns:repeat(7, minmax(0, 1fr));
+    gap:4px;
+    text-align:center;
+}
+
+.weekday-picker-label {
+    font-size:.8rem;
+    font-weight:600;
+}
+
+.weekday-picker-grid button:disabled {
+    color:var(--border);
+    background:rgba(0, 0, 0, .04);
+    cursor:not-allowed;
+}
+
+.weekday-picker-grid button:not(:disabled):hover,
+.weekday-picker-grid button:not(:disabled):focus-visible {
+    border-color:var(--primary);
+    background:var(--primary);
+    color:var(--surface);
+}
+
 .submit_btn {
     background:var(--primary);
     border-color:var(--primary);
