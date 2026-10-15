@@ -10,15 +10,102 @@ class LeaveRepository
     {
     }
 
-    public function fetchCalendarLeaves(): array
+    public function fetchCalendarLeaves(int $viewerId): array
     {
-        $stmt = $this->pdo->query("SELECT l.*, e.first_name, e.last_name, e.department_id, lt.name AS leave_type
-            FROM leaves l 
+        $stmt = $this->pdo->prepare("SELECT
+                l.id,
+                l.start_date,
+                l.end_date,
+                l.status,
+                l.created_at,
+                e.first_name AS employee_first_name,
+                e.last_name AS employee_last_name,
+                e.department_id,
+                d.name AS department_name,
+                lt.name AS leave_type,
+                creator.first_name AS creator_first_name,
+                creator.last_name AS creator_last_name,
+                creator.department_id AS creator_department_id,
+                creator.manager_id AS creator_manager_id,
+                replacement.first_name AS replacement_first_name,
+                replacement.last_name AS replacement_last_name,
+                approver.first_name AS approver_first_name,
+                approver.last_name AS approver_last_name,
+                viewer.department_id AS viewer_department_id,
+                viewer.manager_id AS viewer_manager_id
+            FROM leaves l
             JOIN employees e ON l.employee_id = e.id
+            JOIN departments d ON d.id = e.department_id
             JOIN leave_types lt ON l.leave_type_id = lt.id
+            JOIN employees creator ON creator.id = l.created_by_id
+            LEFT JOIN employees replacement ON replacement.id = l.replacement_id
+            LEFT JOIN employees approver ON approver.id = l.approved_by_id
+            JOIN employees viewer ON viewer.id = :viewer_id
             WHERE l.status IN ('approved', 'pending')");
+        $stmt->execute(['viewer_id' => $viewerId]);
 
         return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    public function decideLeaveRequest(int $managerId, int $leaveId, string $decision): string
+    {
+        $this->pdo->beginTransaction();
+
+        try {
+            $stmt = $this->pdo->prepare("SELECT
+                    l.status,
+                    employee.department_id AS request_department_id,
+                    creator.department_id AS creator_department_id,
+                    creator.manager_id AS creator_manager_id,
+                    manager.department_id AS manager_department_id,
+                    manager.manager_id AS manager_manager_id
+                FROM leaves l
+                JOIN employees employee ON employee.id = l.employee_id
+                JOIN employees creator ON creator.id = l.created_by_id
+                JOIN employees manager ON manager.id = :manager_id
+                WHERE l.id = :leave_id
+                FOR UPDATE");
+            $stmt->execute([
+                'manager_id' => $managerId,
+                'leave_id' => $leaveId,
+            ]);
+            $leave = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$leave) {
+                throw new \InvalidArgumentException('This leave request could not be found.');
+            }
+
+            $isManager = $leave['manager_manager_id'] === null;
+            $sameDepartment = (int) $leave['manager_department_id'] === (int) $leave['request_department_id'];
+            $createdByAnotherDepartmentManager = $leave['creator_manager_id'] === null
+                && (int) $leave['creator_department_id'] !== (int) $leave['request_department_id'];
+            if (!$isManager || (!$sameDepartment && !$createdByAnotherDepartmentManager)) {
+                throw new \DomainException('You are not authorized to decide this leave request.');
+            }
+
+            if (strtolower($leave['status']) !== 'pending') {
+                throw new \InvalidArgumentException('This leave request has already been decided.');
+            }
+
+            $status = $decision === 'approve' ? 'Approved' : 'Rejected';
+            $approvedBy = $decision === 'approve' ? $managerId : null;
+            $update = $this->pdo->prepare('UPDATE leaves
+                SET status = :status, approved_by_id = :approved_by_id, updated_at = NOW()
+                WHERE id = :leave_id');
+            $update->execute([
+                'status' => $status,
+                'approved_by_id' => $approvedBy,
+                'leave_id' => $leaveId,
+            ]);
+
+            $this->pdo->commit();
+            return $status;
+        } catch (\Throwable $exception) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $exception;
+        }
     }
 
     public function fetchLeaveTypes(int $employeeId): array

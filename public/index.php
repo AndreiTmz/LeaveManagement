@@ -34,6 +34,7 @@ $router->get('/employees', [$container->get(EmployeeController::class), 'index']
 
 $router->get('/calendar', [$container->get(DashboardController::class), 'index']);
 $router->get('/calendar/leaves', [$container->get(DashboardController::class), 'getLeaveEvents']);
+$router->post('/calendar/leave-decision', [$container->get(DashboardController::class), 'decideLeaveRequest']);
 
 $router->get('/leaves/request', [$container->get(LeaveController::class), 'showRequestLeave']);
 $router->get('/leaves/replacements', [$container->get(LeaveController::class), 'getReplacementOptions']);

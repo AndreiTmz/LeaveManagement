@@ -11,25 +11,56 @@ class LeaveService
     {
     }
 
-    public function getCalendarLeaves(): array
+    public function getCalendarLeaves(int $viewerId): array
     {
-        $leaves = $this->leaveRepository->fetchCalendarLeaves();
+        $leaves = $this->leaveRepository->fetchCalendarLeaves($viewerId);
         $events = [];
 
         foreach ($leaves as $leave) {
+            $isManager = $leave->viewer_manager_id === null;
+            $sameDepartment = (int) $leave->viewer_department_id === (int) $leave->department_id;
+            $createdByAnotherDepartmentManager = $leave->creator_manager_id === null
+                && (int) $leave->creator_department_id !== (int) $leave->department_id;
             $events[] = [
-                'title' => $leave->first_name . ' ' . $leave->last_name, // 'John Doe'
+                'id' => (string) $leave->id,
+                'title' => $leave->employee_first_name . ' ' . $leave->employee_last_name,
                 'start' => $leave->start_date,    // '2026-07-10'
                 'end'   => (new \DateTimeImmutable($leave->end_date))->modify('+1 day')->format('Y-m-d'),
                 'allDay' => true,
-                'status' => $leave->status,
+                'employee' => $leave->employee_first_name . ' ' . $leave->employee_last_name,
+                'department' => $leave->department_name,
                 'leave_type' => $leave->leave_type,
-                'classNames' => $leave->status === 'pending' ? ['pending-leave-request'] : [],
+                'status' => $leave->status,
+                'start_date' => $leave->start_date,
+                'end_date' => $leave->end_date,
+                'created_at' => $leave->created_at,
+                'created_by' => $leave->creator_first_name . ' ' . $leave->creator_last_name,
+                'replacement' => $leave->replacement_first_name !== null
+                    ? $leave->replacement_first_name . ' ' . $leave->replacement_last_name
+                    : null,
+                'approved_by' => $leave->approver_first_name !== null
+                    ? $leave->approver_first_name . ' ' . $leave->approver_last_name
+                    : null,
+                'can_decide' => $isManager && ($sameDepartment || $createdByAnotherDepartmentManager),
+                'classNames' => strtolower($leave->status) === 'pending' ? ['pending-leave-request'] : [],
                 'backgroundColor' => $this->getDepartmentColor($leave->department_id)
             ];
         }
 
         return $events;
+    }
+
+    public function decideLeaveRequest(int $managerId, int $leaveId, string $decision): string
+    {
+        if ($leaveId < 1) {
+            throw new \InvalidArgumentException('Invalid leave request.');
+        }
+
+        if (!in_array($decision, ['approve', 'reject'], true)) {
+            throw new \InvalidArgumentException('Choose approve or reject.');
+        }
+
+        return $this->leaveRepository->decideLeaveRequest($managerId, $leaveId, $decision);
     }
 
     public function getDepartmentColor(int $departmentId): string 
