@@ -21,9 +21,15 @@ class LeaveRepository
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function fetchLeaveTypes(): array
+    public function fetchLeaveTypes(int $employeeId): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM leave_types");
+        $stmt = $this->pdo->prepare("SELECT lt.id, lt.name, lr.replacement_required
+            FROM leave_types lt
+            JOIN leave_rules lr ON lr.leave_type_id = lt.id
+            JOIN employees e ON e.position_id = lr.position_id
+            WHERE e.id = :employee_id
+            ORDER BY lt.id");
+        $stmt->execute(['employee_id' => $employeeId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -86,19 +92,312 @@ class LeaveRepository
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function createLeaveRequest(int $employeeId, int $leaveTypeId, string $startDate, string $endDate): bool
+    public function fetchEligibleReplacementEmployees(
+        int $employeeId,
+        int $leaveTypeId,
+        string $startDate,
+        string $endDate
+    ): array
     {
-        $stmt = $this->pdo->prepare("INSERT INTO leaves
-                (start_date, end_date, leave_type_id, status, employee_id, created_by_id, created_at)
-            VALUES
-                (:start_date, :end_date, :leave_type_id, 'Pending', :employee_id, :created_by_id, NOW())");
+        $requester = $this->fetchEmployeeContext($employeeId);
+        $rule = $requester ? $this->fetchLeaveRule($requester['position_id'], $leaveTypeId) : null;
+        if (!$rule || !$rule['replacement_required']) {
+            return [];
+        }
 
-        return $stmt->execute([
+        $candidates = $this->fetchDepartmentEmployees($requester['department_id'], $employeeId);
+        if (!$candidates) {
+            return [];
+        }
+
+        $unavailableIds = $this->fetchUnavailableEmployeeIds($candidates, $startDate, $endDate);
+        $samePosition = [];
+        $otherPositions = [];
+
+        foreach ($candidates as $candidate) {
+            if (isset($unavailableIds[$candidate['id']])) {
+                continue;
+            }
+
+            $employee = [
+                'id' => $candidate['id'],
+                'name' => $candidate['first_name'] . ' ' . $candidate['last_name'],
+            ];
+            if ($candidate['position_id'] === $requester['position_id']) {
+                $samePosition[] = $employee;
+            } else {
+                $otherPositions[] = $employee;
+            }
+        }
+
+        return $samePosition ?: $otherPositions;
+    }
+
+    public function createLeaveRequest(
+        int $employeeId,
+        int $leaveTypeId,
+        string $startDate,
+        string $endDate,
+        ?int $replacementId,
+        int $year
+    ): bool {
+        $this->pdo->exec('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+        $this->pdo->beginTransaction();
+
+        try {
+            $requester = $this->fetchEmployeeContext($employeeId);
+            if (!$requester) {
+                throw new \InvalidArgumentException('Your employee account could not be found. Please sign in again.');
+            }
+
+            $lockDepartment = $this->pdo->prepare('SELECT id FROM departments WHERE id = :department_id FOR UPDATE');
+            $lockDepartment->execute(['department_id' => $requester['department_id']]);
+            if (!$lockDepartment->fetchColumn()) {
+                throw new \InvalidArgumentException('Your department could not be found.');
+            }
+
+            $rule = $this->fetchLeaveRule($requester['position_id'], $leaveTypeId);
+            if (!$rule) {
+                throw new \InvalidArgumentException('Select a valid leave type.');
+            }
+
+            $yearStart = sprintf('%04d-01-01', $year);
+            $yearEnd = sprintf('%04d-12-31', $year);
+            $usage = $this->pdo->prepare("SELECT COALESCE(SUM(
+                    DATEDIFF(LEAST(end_date, :year_end), GREATEST(start_date, :year_start)) + 1
+                ), 0)
+                FROM leaves
+                WHERE employee_id = :employee_id
+                    AND leave_type_id = :leave_type_id
+                    AND status = 'approved'
+                    AND start_date <= :overlap_end
+                    AND end_date >= :overlap_start");
+            $usage->execute([
+                'year_end' => $yearEnd,
+                'year_start' => $yearStart,
+                'employee_id' => $employeeId,
+                'leave_type_id' => $leaveTypeId,
+                'overlap_end' => $yearEnd,
+                'overlap_start' => $yearStart,
+            ]);
+
+            $requestedStart = max($startDate, $yearStart);
+            $requestedEnd = min($endDate, $yearEnd);
+            $requestedDays = $requestedStart <= $requestedEnd
+                ? (new \DateTimeImmutable($requestedStart))->diff(new \DateTimeImmutable($requestedEnd))->days + 1
+                : 0;
+            if ((int) $usage->fetchColumn() + $requestedDays > (int) $rule['max_days_per_year']) {
+                throw new \InvalidArgumentException('You do not have enough remaining leave days for this leave type this calendar year.');
+            }
+
+            $eligibleReplacements = $this->fetchEligibleReplacementEmployees(
+                $employeeId,
+                $leaveTypeId,
+                $startDate,
+                $endDate
+            );
+            if ($rule['replacement_required'] && !$eligibleReplacements) {
+                throw new \InvalidArgumentException('No eligible replacement employee is available for the selected dates.');
+            }
+            if ($rule['replacement_required'] && $replacementId === null) {
+                throw new \InvalidArgumentException('Select an eligible replacement employee.');
+            }
+            if ($replacementId !== null) {
+                $eligibleIds = array_column($eligibleReplacements, 'id');
+                if (!in_array($replacementId, $eligibleIds, true)) {
+                    throw new \InvalidArgumentException('Select an eligible replacement employee for the selected dates.');
+                }
+            }
+
+            $this->validateDepartmentStaffing(
+                $requester['department_id'],
+                $employeeId,
+                $startDate,
+                $endDate
+            );
+
+            $stmt = $this->pdo->prepare("INSERT INTO leaves
+                    (start_date, end_date, leave_type_id, status, employee_id, created_by_id, replacement_id, created_at)
+                VALUES
+                    (:start_date, :end_date, :leave_type_id, 'Pending', :employee_id, :created_by_id, :replacement_id, NOW())");
+
+            $created = $stmt->execute([
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'leave_type_id' => $leaveTypeId,
+                'employee_id' => $employeeId,
+                'created_by_id' => $employeeId,
+                'replacement_id' => $replacementId,
+            ]);
+            $this->pdo->commit();
+            return $created;
+        } catch (\Throwable $exception) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $exception;
+        }
+    }
+
+    private function fetchEmployeeContext(int $employeeId): ?array
+    {
+        $stmt = $this->pdo->prepare('SELECT id, department_id, position_id FROM employees WHERE id = :employee_id');
+        $stmt->execute(['employee_id' => $employeeId]);
+        $employee = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$employee) {
+            return null;
+        }
+
+        return [
+            'id' => (int) $employee['id'],
+            'department_id' => (int) $employee['department_id'],
+            'position_id' => (int) $employee['position_id'],
+        ];
+    }
+
+    private function fetchLeaveRule(int $positionId, int $leaveTypeId): ?array
+    {
+        $stmt = $this->pdo->prepare('SELECT max_days_per_year, replacement_required
+            FROM leave_rules
+            WHERE position_id = :position_id AND leave_type_id = :leave_type_id');
+        $stmt->execute([
+            'position_id' => $positionId,
+            'leave_type_id' => $leaveTypeId,
+        ]);
+        $rule = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$rule) {
+            return null;
+        }
+
+        return [
+            'max_days_per_year' => (int) $rule['max_days_per_year'],
+            'replacement_required' => (bool) $rule['replacement_required'],
+        ];
+    }
+
+    private function fetchDepartmentEmployees(int $departmentId, int $excludedEmployeeId): array
+    {
+        $stmt = $this->pdo->prepare('SELECT id, first_name, last_name, position_id
+            FROM employees
+            WHERE department_id = :department_id AND id <> :employee_id
+            ORDER BY last_name, first_name, id');
+        $stmt->execute([
+            'department_id' => $departmentId,
+            'employee_id' => $excludedEmployeeId,
+        ]);
+
+        return array_map(static function (array $employee): array {
+            return [
+                'id' => (int) $employee['id'],
+                'first_name' => $employee['first_name'],
+                'last_name' => $employee['last_name'],
+                'position_id' => (int) $employee['position_id'],
+            ];
+        }, $stmt->fetchAll(PDO::FETCH_ASSOC));
+    }
+
+    private function fetchUnavailableEmployeeIds(array $employees, string $startDate, string $endDate): array
+    {
+        if (!$employees) {
+            return [];
+        }
+
+        $placeholders = [];
+        $parameters = [
             'start_date' => $startDate,
             'end_date' => $endDate,
-            'leave_type_id' => $leaveTypeId,
-            'employee_id' => $employeeId,
-            'created_by_id' => $employeeId,
+        ];
+        foreach ($employees as $index => $employee) {
+            $placeholder = 'employee_' . $index;
+            $placeholders[] = ':' . $placeholder;
+            $parameters[$placeholder] = $employee['id'];
+        }
+
+        $stmt = $this->pdo->prepare("SELECT DISTINCT employee_id
+            FROM leaves
+            WHERE employee_id IN (" . implode(', ', $placeholders) . ")
+                AND status IN ('approved', 'pending')
+                AND start_date <= :end_date
+                AND end_date >= :start_date");
+        $stmt->execute($parameters);
+
+        $unavailable = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $employeeId) {
+            $unavailable[(int) $employeeId] = true;
+        }
+
+        return $unavailable;
+    }
+
+    private function validateDepartmentStaffing(
+        int $departmentId,
+        int $requesterId,
+        string $startDate,
+        string $endDate
+    ): void {
+        $employeeCount = $this->pdo->prepare('SELECT COUNT(*) FROM employees WHERE department_id = :department_id');
+        $employeeCount->execute(['department_id' => $departmentId]);
+        $departmentSize = (int) $employeeCount->fetchColumn();
+        $maxOnLeave = $departmentSize - (int) ceil($departmentSize / 3);
+
+        $stmt = $this->pdo->prepare("SELECT l.employee_id, l.start_date, l.end_date
+            FROM leaves l
+            JOIN employees e ON e.id = l.employee_id
+            WHERE e.department_id = :department_id
+                AND l.status IN ('approved', 'pending')
+                AND l.start_date <= :end_date
+                AND l.end_date >= :start_date");
+        $stmt->execute([
+            'department_id' => $departmentId,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
         ]);
+        $existingLeaves = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $intervalsByEmployee = [$requesterId => [[$startDate, $endDate]]];
+        foreach ($existingLeaves as $leave) {
+            $employeeId = (int) $leave['employee_id'];
+            $intervalsByEmployee[$employeeId][] = [
+                max($startDate, $leave['start_date']),
+                min($endDate, $leave['end_date']),
+            ];
+        }
+
+        $events = [];
+        foreach ($intervalsByEmployee as $intervals) {
+            usort($intervals, static fn(array $left, array $right): int => $left[0] <=> $right[0]);
+            $mergedIntervals = [];
+
+            foreach ($intervals as $interval) {
+                $lastIndex = count($mergedIntervals) - 1;
+                if ($lastIndex >= 0 && $interval[0] <= $mergedIntervals[$lastIndex][1]) {
+                    $mergedIntervals[$lastIndex][1] = max($mergedIntervals[$lastIndex][1], $interval[1]);
+                } else {
+                    $mergedIntervals[] = $interval;
+                }
+            }
+
+            foreach ($mergedIntervals as [$intervalStart, $intervalEnd]) {
+                $events[$intervalStart] = ($events[$intervalStart] ?? 0) + 1;
+                $dayAfterEnd = (new \DateTimeImmutable($intervalEnd))->modify('+1 day')->format('Y-m-d');
+                $events[$dayAfterEnd] = ($events[$dayAfterEnd] ?? 0) - 1;
+            }
+        }
+
+        ksort($events);
+        $dates = array_keys($events);
+        $unavailableCount = 0;
+        for ($index = 0; $index < count($dates) - 1; $index++) {
+            $date = $dates[$index];
+            $unavailableCount += $events[$date];
+            if ($date <= $endDate && $dates[$index + 1] > $startDate && $unavailableCount > $maxOnLeave) {
+                $offendingDate = max($date, $startDate);
+                throw new \InvalidArgumentException(
+                    'This request would leave fewer than one-third of your department available on ' . $offendingDate . '.'
+                );
+            }
+        }
     }
 }

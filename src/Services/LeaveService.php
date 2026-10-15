@@ -45,9 +45,29 @@ class LeaveService
         return $colors[$departmentId] ?? '#000000'; // Default to black if not found
     }
 
-    public function getLeaveTypes(): array
+    public function getLeaveTypes(int $employeeId): array
     {
-        return $this->leaveRepository->fetchLeaveTypes();
+        return $this->leaveRepository->fetchLeaveTypes($employeeId);
+    }
+
+    public function getEligibleReplacementEmployees(
+        int $employeeId,
+        int $leaveTypeId,
+        string $startDate,
+        string $endDate
+    ): array {
+        $start = $this->parseDate($startDate);
+        $end = $this->parseDate($endDate);
+        if (!$start || !$end || $end < $start) {
+            return [];
+        }
+
+        return $this->leaveRepository->fetchEligibleReplacementEmployees(
+            $employeeId,
+            $leaveTypeId,
+            $startDate,
+            $endDate
+        );
     }
 
     public function getRemainingLeaveDays(int $employeeId) : array
@@ -85,12 +105,18 @@ class LeaveService
         return $workingDays;
     }
 
-    public function requestLeave(int $employeeId, int $leaveTypeId, string $startDate, string $endDate): bool
+    public function requestLeave(
+        int $employeeId,
+        int $leaveTypeId,
+        string $startDate,
+        string $endDate,
+        ?int $replacementId = null
+    ): bool
     {
-        $start = \DateTimeImmutable::createFromFormat('!Y-m-d', $startDate);
-        $end = \DateTimeImmutable::createFromFormat('!Y-m-d', $endDate);
+        $start = $this->parseDate($startDate);
+        $end = $this->parseDate($endDate);
 
-        if (!$start || $start->format('Y-m-d') !== $startDate || !$end || $end->format('Y-m-d') !== $endDate) {
+        if (!$start || !$end) {
             throw new \InvalidArgumentException('Enter valid start and end dates.');
         }
 
@@ -102,6 +128,50 @@ class LeaveService
             throw new \InvalidArgumentException('Select a leave type.');
         }
 
-        return $this->leaveRepository->createLeaveRequest($employeeId, $leaveTypeId, $startDate, $endDate);
+        $earliestStartDate = $this->getEarliestAllowedStartDate();
+        if ($start < $earliestStartDate) {
+            throw new \InvalidArgumentException(
+                'The start date must be at least three working days from today. The earliest allowed date is '
+                . $earliestStartDate->format('Y-m-d') . '.'
+            );
+        }
+
+        return $this->leaveRepository->createLeaveRequest(
+            $employeeId,
+            $leaveTypeId,
+            $startDate,
+            $endDate,
+            $replacementId,
+            (int) (new \DateTimeImmutable('now'))->format('Y')
+        );
+    }
+
+    private function parseDate(string $date): ?\DateTimeImmutable
+    {
+        $parsed = \DateTimeImmutable::createFromFormat('!Y-m-d', $date);
+        $errors = \DateTimeImmutable::getLastErrors();
+
+        if (!$parsed || ($errors && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))
+            || $parsed->format('Y-m-d') !== $date
+        ) {
+            return null;
+        }
+
+        return $parsed;
+    }
+
+    private function getEarliestAllowedStartDate(): \DateTimeImmutable
+    {
+        $date = new \DateTimeImmutable('today');
+        $workingDays = 0;
+
+        while ($workingDays < 3) {
+            $date = $date->modify('+1 day');
+            if ((int) $date->format('N') < 6) {
+                $workingDays++;
+            }
+        }
+
+        return $date;
     }
 }

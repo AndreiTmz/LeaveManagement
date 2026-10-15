@@ -36,6 +36,7 @@ $router->get('/calendar', [$container->get(DashboardController::class), 'index']
 $router->get('/calendar/leaves', [$container->get(DashboardController::class), 'getLeaveEvents']);
 
 $router->get('/leaves/request', [$container->get(LeaveController::class), 'showRequestLeave']);
+$router->get('/leaves/replacements', [$container->get(LeaveController::class), 'getReplacementOptions']);
 $router->post('/leaves/request', [$container->get(LeaveController::class), 'requestLeave']);
 
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
