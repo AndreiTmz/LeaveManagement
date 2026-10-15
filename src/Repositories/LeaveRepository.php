@@ -41,7 +41,7 @@ class LeaveRepository
             LEFT JOIN employees replacement ON replacement.id = l.replacement_id
             LEFT JOIN employees approver ON approver.id = l.approved_by_id
             JOIN employees viewer ON viewer.id = :viewer_id
-            WHERE l.status IN ('approved', 'pending')");
+            WHERE LOWER(l.status) IN ('approved', 'pending', 'rejected')");
         $stmt->execute(['viewer_id' => $viewerId]);
 
         return $stmt->fetchAll(PDO::FETCH_OBJ);

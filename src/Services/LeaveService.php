@@ -42,7 +42,11 @@ class LeaveService
                     ? $leave->approver_first_name . ' ' . $leave->approver_last_name
                     : null,
                 'can_decide' => $isManager && ($sameDepartment || $createdByAnotherDepartmentManager),
-                'classNames' => strtolower($leave->status) === 'pending' ? ['pending-leave-request'] : [],
+                'classNames' => match (strtolower($leave->status)) {
+                    'pending' => ['pending-leave-request'],
+                    'rejected' => ['rejected-leave-request'],
+                    default => [],
+                },
                 'backgroundColor' => $this->getDepartmentColor($leave->department_id)
             ];
         }

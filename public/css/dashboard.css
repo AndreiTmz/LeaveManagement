@@ -200,6 +200,10 @@
     opacity:.5;
 }
 
+#calendar .rejected-leave-request .fc-event-title {
+    text-decoration:line-through;
+}
+
 #calendar .fc-event {
     cursor: pointer;
 }
