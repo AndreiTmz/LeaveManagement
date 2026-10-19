@@ -69,3 +69,77 @@ body {
     background: var(--primary-hover);
     border-color: var(--primary-hover);
 }
+
+.settings-menu {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 1050;
+}
+
+.settings-menu-toggle {
+    display: grid;
+    width: 52px;
+    height: 52px;
+    place-items: center;
+    border: 1px solid var(--primary);
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    list-style: none;
+    transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.settings-menu-toggle::-webkit-details-marker {
+    display: none;
+}
+
+.settings-menu-toggle i {
+    font-size: 22px;
+}
+
+.settings-menu-toggle:hover,
+.settings-menu[open] .settings-menu-toggle {
+    background: var(--primary-hover);
+    transform: rotate(30deg);
+}
+
+.settings-menu-toggle:focus-visible {
+    outline: 3px solid var(--primary-hover);
+    outline-offset: 3px;
+}
+
+.settings-menu-popover {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 12px);
+    min-width: 180px;
+    padding: 6px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.settings-menu-popover a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 6px;
+    color: var(--text);
+    text-decoration: none;
+}
+
+.settings-menu-popover a:hover,
+.settings-menu-popover a:focus-visible {
+    background: rgba(138, 113, 87, .12);
+    color: var(--text);
+}
+
+@media (max-width: 480px) {
+    .settings-menu {
+        right: 16px;
+        bottom: 16px;
+    }
+}

@@ -31,6 +31,33 @@
             <?php endif; ?>
         </main>
 
+        <details class="settings-menu">
+            <summary class="settings-menu-toggle" aria-label="Open settings" title="Settings">
+                <i class="fa-solid fa-gear" aria-hidden="true"></i>
+            </summary>
+            <nav class="settings-menu-popover" aria-label="Settings">
+                <a href="/change-password">Change password</a>
+            </nav>
+        </details>
+
+        <script>
+            (() => {
+                const settingsMenu = document.querySelector('.settings-menu');
+
+                document.addEventListener('click', (event) => {
+                    if (settingsMenu.open && !settingsMenu.contains(event.target)) {
+                        settingsMenu.open = false;
+                    }
+                });
+
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') {
+                        settingsMenu.open = false;
+                    }
+                });
+            })();
+        </script>
+
        <?php require __DIR__ . '/partials/scripts.php'; ?>
 
     </body>

@@ -43,6 +43,50 @@ class AuthController extends BaseController
         exit;
     }
 
+    public function showChangePassword(): void
+    {
+        $this->requireAuth();
+
+        $this->renderChangePasswordForm();
+    }
+
+    public function changePassword(): void
+    {
+        $this->requireAuth();
+
+        $currentPassword = is_string($_POST['current_password'] ?? null) ? $_POST['current_password'] : '';
+        $newPassword = is_string($_POST['new_password'] ?? null) ? $_POST['new_password'] : '';
+        $confirmPassword = is_string($_POST['confirm_password'] ?? null) ? $_POST['confirm_password'] : '';
+
+        try {
+            if ($newPassword !== $confirmPassword) {
+                throw new \InvalidArgumentException('The new password and confirmation do not match.');
+            }
+
+            $this->authService->changePassword(
+                (int) $_SESSION['user_id'],
+                $currentPassword,
+                $newPassword
+            );
+        } catch (\InvalidArgumentException $exception) {
+            $this->renderChangePasswordForm($exception->getMessage());
+            return;
+        }
+
+        header('Location: /change-password?success=1');
+        exit;
+    }
+
+    private function renderChangePasswordForm(string $errorMessage = ''): void
+    {
+        $this->view('auth/change-password', [
+            'title' => 'Change password',
+            'styles' => ['/css/forms.css'],
+            'errorMessage' => $errorMessage,
+            'success' => ($_GET['success'] ?? '') === '1',
+        ]);
+    }
+
     private function showLoginForm(string $email = '', string $errorMessage = ''): void
     {
         $this->view('auth/login', [

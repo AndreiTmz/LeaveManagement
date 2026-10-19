@@ -29,6 +29,8 @@ $router->get('/', [$container->get(HomeController::class), 'index']);
 $router->get('/login', [$container->get(AuthController::class), 'showLogin']);
 $router->post('/login', [$container->get(AuthController::class), 'login']);
 $router->post('/logout', [$container->get(AuthController::class), 'logout']);
+$router->get('/change-password', [$container->get(AuthController::class), 'showChangePassword']);
+$router->post('/change-password', [$container->get(AuthController::class), 'changePassword']);
 
 $router->get('/employees', [$container->get(EmployeeController::class), 'index']);
 $router->get('/employees/add', [$container->get(EmployeeController::class), 'showAddForm']);

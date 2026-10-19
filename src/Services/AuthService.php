@@ -40,6 +40,45 @@ class AuthService
         return $this->employeeRepository->findById($_SESSION['user_id']);
     }
 
+    public function changePassword(int $employeeId, string $currentPassword, string $newPassword): void
+    {
+        if ($currentPassword === '') {
+            throw new \InvalidArgumentException('Enter your current password.');
+        }
+        if ($newPassword === '') {
+            throw new \InvalidArgumentException('Enter a new password.');
+        }
+        $passwordLength = preg_match_all('/[\s\S]/u', $newPassword);
+        if ($passwordLength === false) {
+            throw new \InvalidArgumentException('Enter a valid new password.');
+        }
+        if ($passwordLength < 8) {
+            throw new \InvalidArgumentException('Your new password must be at least 8 characters long.');
+        }
+        if (!preg_match('/[A-Z]/', $newPassword)) {
+            throw new \InvalidArgumentException('Your new password must contain at least one uppercase letter.');
+        }
+        if (!preg_match('/[0-9]/', $newPassword)) {
+            throw new \InvalidArgumentException('Your new password must contain at least one number.');
+        }
+
+        $employee = $this->employeeRepository->findById($employeeId);
+        if ($employee === null) {
+            throw new \RuntimeException('The authenticated user could not be found.');
+        }
+        if (!password_verify($currentPassword, $employee->password_hash)) {
+            throw new \InvalidArgumentException('The current password is incorrect.');
+        }
+        if (password_verify($newPassword, $employee->password_hash)) {
+            throw new \InvalidArgumentException('Your new password must be different from your current password.');
+        }
+
+        $this->employeeRepository->updatePassword(
+            $employeeId,
+            password_hash($newPassword, PASSWORD_BCRYPT)
+        );
+    }
+
     public function logout(): void
     {
         session_destroy();

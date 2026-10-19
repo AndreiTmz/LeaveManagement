@@ -5,6 +5,7 @@
     <title><?= htmlspecialchars($title ?? 'Leave Management') ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="icon" href="/favicon.ico">
     

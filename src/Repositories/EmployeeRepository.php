@@ -103,4 +103,15 @@ class EmployeeRepository
 
         return $data ? Employee::fromArray($data) : null;
     }
+
+    public function updatePassword(int $employeeId, string $passwordHash): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE employees SET password_hash = :password_hash WHERE id = :employee_id'
+        );
+        $stmt->execute([
+            'password_hash' => $passwordHash,
+            'employee_id' => $employeeId,
+        ]);
+    }
 }
