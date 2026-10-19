@@ -122,9 +122,9 @@
 .form-page {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    min-height: calc(100vh - 120px);
-    padding: 2rem 1rem 0;
+    align-items: center;
+    min-height: calc(100vh - 180px);
+    padding: 3rem 1rem;
 }
 
 .login-page {

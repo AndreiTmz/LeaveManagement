@@ -28,6 +28,7 @@ class LeaveService
                 'end'   => (new \DateTimeImmutable($leave->end_date))->modify('+1 day')->format('Y-m-d'),
                 'allDay' => true,
                 'employee' => $leave->employee_first_name . ' ' . $leave->employee_last_name,
+                'employee_position' => $leave->employee_position,
                 'department' => $leave->department_name,
                 'leave_type' => $leave->leave_type,
                 'status' => $leave->status,

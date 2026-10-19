@@ -20,6 +20,7 @@ class LeaveRepository
                 l.created_at,
                 e.first_name AS employee_first_name,
                 e.last_name AS employee_last_name,
+                p.name AS employee_position,
                 e.department_id,
                 d.name AS department_name,
                 lt.name AS leave_type,
@@ -35,6 +36,7 @@ class LeaveRepository
                 viewer.manager_id AS viewer_manager_id
             FROM leaves l
             JOIN employees e ON l.employee_id = e.id
+            JOIN positions p ON p.id = e.position_id
             JOIN departments d ON d.id = e.department_id
             JOIN leave_types lt ON l.leave_type_id = lt.id
             JOIN employees creator ON creator.id = l.created_by_id

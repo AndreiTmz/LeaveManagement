@@ -24,7 +24,9 @@ class AuthService
 
         $_SESSION['user_id'] = $user->id;
         $_SESSION['position_id'] = $user->position_id;
+        $_SESSION['department_id'] = $user->department_id;
         $_SESSION['full_name'] = $user->first_name . ' ' . $user->last_name;
+        $_SESSION['is_manager'] = $user->manager_id === null;
 
         return true;
     }

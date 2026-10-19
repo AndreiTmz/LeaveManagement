@@ -31,6 +31,8 @@ $router->post('/login', [$container->get(AuthController::class), 'login']);
 $router->post('/logout', [$container->get(AuthController::class), 'logout']);
 
 $router->get('/employees', [$container->get(EmployeeController::class), 'index']);
+$router->get('/employees/add', [$container->get(EmployeeController::class), 'showAddForm']);
+$router->post('/employees/add', [$container->get(EmployeeController::class), 'add']);
 
 $router->get('/calendar', [$container->get(DashboardController::class), 'index']);
 $router->get('/calendar/leaves', [$container->get(DashboardController::class), 'getLeaveEvents']);

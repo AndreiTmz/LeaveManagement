@@ -16,4 +16,14 @@ abstract class BaseController
             exit;
         }
     }
+
+    protected function requireManager(): void
+    {
+        $this->requireAuth();
+
+        if (($_SESSION['is_manager'] ?? false) !== true) {
+            header('Location: /calendar');
+            exit;
+        }
+    }
 }

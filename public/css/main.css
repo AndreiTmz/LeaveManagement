@@ -20,6 +20,19 @@ body {
     border-radius: var(--radius);
 }
 
+.calendar-action-button {
+    border:1px solid var(--primary);
+    background:var(--primary);
+    color:#fff;
+}
+
+.calendar-action-button:hover,
+.calendar-action-button:focus-visible {
+    border-color:var(--primary-hover);
+    background:var(--primary-hover);
+    color:#fff;
+}
+
 .form-control {
     border-radius: var(--radius);
 }

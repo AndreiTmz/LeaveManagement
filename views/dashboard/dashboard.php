@@ -88,6 +88,7 @@
     </div>
     <dl class="leave-event-details">
         <dt>Employee</dt><dd id="leave-event-employee"></dd>
+        <dt>Position</dt><dd id="leave-event-position"></dd>
         <dt>Department</dt><dd id="leave-event-department"></dd>
         <dt>Leave type</dt><dd id="leave-event-type"></dd>
         <dt>Dates</dt><dd id="leave-event-dates"></dd>
@@ -164,6 +165,7 @@
                     const event = info.event;
                     const details = event.extendedProps;
                     setLeaveDetail('employee', details.employee);
+                    setLeaveDetail('position', details.employee_position);
                     setLeaveDetail('department', details.department);
                     setLeaveDetail('type', details.leave_type);
                     setLeaveDetail('dates', `${formatDate(details.start_date)} – ${formatDate(details.end_date)}`);
