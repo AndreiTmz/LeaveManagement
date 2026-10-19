@@ -20,16 +20,31 @@
                 <?= csrf_field() ?>
                 <div class="mb-3">
                     <label class="form-label" for="current-password">Old password</label>
-                    <input class="form-control" id="current-password" type="password" name="current_password" autocomplete="current-password" required>
+                    <div class="password-field">
+                        <input class="form-control" id="current-password" type="password" name="current_password" autocomplete="current-password" required>
+                        <button class="password-visibility-toggle" type="button" aria-label="Show password" aria-pressed="false">
+                            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="new-password">New password</label>
-                    <input class="form-control" id="new-password" type="password" name="new_password" autocomplete="new-password" minlength="8" pattern="(?=.*[A-Z])(?=.*[0-9]).{8,}" aria-describedby="password-requirements" required>
+                    <div class="password-field">
+                        <input class="form-control" id="new-password" type="password" name="new_password" autocomplete="new-password" minlength="8" pattern="(?=.*[A-Z])(?=.*[0-9]).{8,}" aria-describedby="password-requirements" required>
+                        <button class="password-visibility-toggle" type="button" aria-label="Show password" aria-pressed="false">
+                            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
                     <div class="form-text" id="password-requirements">At least 8 characters, including one uppercase letter and one number.</div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="confirm-password">Confirm new password</label>
-                    <input class="form-control" id="confirm-password" type="password" name="confirm_password" autocomplete="new-password" aria-describedby="password-match-error" required>
+                    <div class="password-field">
+                        <input class="form-control" id="confirm-password" type="password" name="confirm_password" autocomplete="new-password" aria-describedby="password-match-error" required>
+                        <button class="password-visibility-toggle" type="button" aria-label="Show password" aria-pressed="false">
+                            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
                     <div class="invalid-feedback" id="password-match-error" role="alert" hidden>
                         The new password and confirmation do not match.
                     </div>

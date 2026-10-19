@@ -52,6 +52,43 @@
     border:1px solid var(--border);
 }
 
+.password-field {
+    position:relative;
+}
+
+.password-field .form-control {
+    padding-right:48px;
+}
+
+.password-visibility-toggle {
+    position:absolute;
+    top:50%;
+    right:10px;
+    display:grid;
+    width:32px;
+    height:32px;
+    place-items:center;
+    padding:0;
+    transform:translateY(-50%);
+    border:0;
+    border-radius:6px;
+    background:transparent;
+    color:var(--primary);
+}
+
+.password-visibility-toggle:hover {
+    color:var(--primary-hover);
+}
+
+.password-visibility-toggle:focus-visible {
+    outline:2px solid var(--primary);
+    outline-offset:1px;
+}
+
+.password-visibility-toggle i {
+    font-size:16px;
+}
+
 .form-card .form-control:focus {
     border-color:var(--primary);
     box-shadow:0 0 0 .2rem rgba(138,113,87,.2);

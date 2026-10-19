@@ -82,6 +82,7 @@ class AuthController extends BaseController
         $this->view('auth/change-password', [
             'title' => 'Change password',
             'styles' => ['/css/forms.css'],
+            'scripts' => ['/js/password-visibility.js'],
             'errorMessage' => $errorMessage,
             'success' => ($_GET['success'] ?? '') === '1',
         ]);
@@ -92,6 +93,7 @@ class AuthController extends BaseController
         $this->view('auth/login', [
             'title' => 'Login',
             'styles' => ['/css/forms.css'],
+            'scripts' => ['/js/password-visibility.js'],
             'email' => $email,
             'errorMessage' => $errorMessage,
         ], 'guest');

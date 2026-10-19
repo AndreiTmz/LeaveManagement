@@ -16,7 +16,12 @@
 
                 <div class="mb-3">
                     <label class="form-label">Password</label>
-                    <input class="form-control" type="password" name="password" required>
+                    <div class="password-field">
+                        <input class="form-control" type="password" name="password" autocomplete="current-password" required>
+                        <button class="password-visibility-toggle" type="button" aria-label="Show password" aria-pressed="false">
+                            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <?php if (!empty($errorMessage)): ?>
