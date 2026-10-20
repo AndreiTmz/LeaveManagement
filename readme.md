@@ -38,7 +38,7 @@ From the project root, run:
 docker-compose up -d --build
 ```
 
-Docker builds the PHP/Apache container, starts MySQL, and initializes a new database with the SQL files in `database/`.
+Docker builds the PHP/Apache container, installs Composer dependencies and generates the autoloader, then starts the app after MySQL is healthy. On its first start with a fresh data volume, MySQL initializes the database using the SQL files in `database/`.
 
 Open the application at **http://localhost:8000**.
 
@@ -57,8 +57,8 @@ The database seed creates example manager and employee accounts. Sign in with ei
 
 | Role | Email | Username | Password |
 | --- | --- | --- | --- |
-| Manager | `andreea.radu@company.com` | `aradu` | `Password123!` |
-| Employee | `elena.stan@company.com` | `estan` | `Password123!` |
+| Manager | `charlotte.hayes@company.com` | `chayes` | `Password123!` |
+| Employee | `amelia.carter@company.com` | `acarter` | `Password123!` |
 
 New employees created from the manager menu are assigned the initial password `Password123!`. They should change it after their first sign-in.
 
@@ -99,6 +99,12 @@ docker-compose up -d --build
 ```
 
 > **Warning:** `docker-compose down -v` deletes the database and all data stored in it. The SQL initialization files run automatically only when MySQL creates a new data directory.
+
+If the database was not initialized, confirm that you ran these commands from the project directory and that you removed the volume with `docker-compose down -v`. MySQL does not rerun initialization scripts when it finds an existing data volume. Check startup output with:
+
+```sh
+docker-compose logs db app
+```
 
 ## Project structure
 

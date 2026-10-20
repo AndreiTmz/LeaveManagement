@@ -65,46 +65,46 @@ INSERT INTO employees
 VALUES
 
 -- ADMINISTRATION (Dept 1)
-('Daniel', 'Petrescu', 'daniel.petrescu@company.com', 'dpetrescu', '$2y$12$EMENhLIwA9mcbNSVBcnqaumoaJZnwumLuXn9gSxYEl4YnP4JCDH1G', 3, 1, NULL, NOW()),
-('Elena', 'Stan', 'elena.stan@company.com', 'estan', '$2y$12$KULCrij4oY63GKoSwbnSCu0F.nJol31n.CrkssV.OGLIAXnCTa/4K', 1, 1, 1, NOW()),
-('Mihai', 'Ionescu', 'mihai.ionescu@company.com', 'mionescu', '$2y$12$JjLRkmjxioWgZe6iwRgPte8zEamT8EjfDD2tmwoNI1/Mp2YpXm.YO', 2, 1, 1, NOW()),
+('Oliver', 'Bennett', 'oliver.bennett@company.com', 'obennett', '$2y$12$EMENhLIwA9mcbNSVBcnqaumoaJZnwumLuXn9gSxYEl4YnP4JCDH1G', 3, 1, NULL, NOW()),
+('Amelia', 'Carter', 'amelia.carter@company.com', 'acarter', '$2y$12$KULCrij4oY63GKoSwbnSCu0F.nJol31n.CrkssV.OGLIAXnCTa/4K', 1, 1, 1, NOW()),
+('Henry', 'Walker', 'henry.walker@company.com', 'hwalker', '$2y$12$JjLRkmjxioWgZe6iwRgPte8zEamT8EjfDD2tmwoNI1/Mp2YpXm.YO', 2, 1, 1, NOW()),
 
 -- FINANCE (Dept 2)
-('Andreea', 'Radu', 'andreea.radu@company.com', 'aradu', '$2y$12$bq4fJ6QXiC.aVF0BTfOHp.LIIXoFwu1gWLV7YN9NYHbqwDnyflbFu', 5, 2, NULL, NOW()),
-('Vlad', 'Dumitru', 'vlad.dumitru@company.com', 'vdumitru', '$2y$12$DTNOzvypo734T67ykZPVF.U4G5HyiXvy0JBJLZmajSdOZKGXRzqX6', 1, 2, 4, NOW()),
-('Ioana', 'Matei', 'ioana.matei@company.com', 'imatei', '$2y$12$fqq9Rabn7skpuBAX7.NYSebIz5XmcTWquH47wlrmCT8Nep9NOu/VC', 2, 2, 4, NOW()),
+('Charlotte', 'Hayes', 'charlotte.hayes@company.com', 'chayes', '$2y$12$bq4fJ6QXiC.aVF0BTfOHp.LIIXoFwu1gWLV7YN9NYHbqwDnyflbFu', 5, 2, NULL, NOW()),
+('Ethan', 'Brooks', 'ethan.brooks@company.com', 'ebrooks', '$2y$12$DTNOzvypo734T67ykZPVF.U4G5HyiXvy0JBJLZmajSdOZKGXRzqX6', 1, 2, 4, NOW()),
+('Grace', 'Foster', 'grace.foster@company.com', 'gfoster', '$2y$12$fqq9Rabn7skpuBAX7.NYSebIz5XmcTWquH47wlrmCT8Nep9NOu/VC', 2, 2, 4, NOW()),
 
 -- HR (Dept 3)
-('Maria', 'Georgescu', 'maria.georgescu@company.com', 'mgeorgescu', '$2y$12$WGoiZ92pX/ZGGP6trncCxOsk4USkBe634.Dy3UvNlaztlXodMvaOy', 4, 3, NULL, NOW()),
-('Raluca', 'Popa', 'raluca.popa@company.com', 'rpopa', '$2y$12$TufS.PwsUDrcGQa2gNeOJegw8YsXhdkY0D1.RTJB33CPC7ZSPtsgq', 1, 3, 7, NOW()),
-('Cristina', 'Dobre', 'cristina.dobre@company.com', 'cdobre', '$2y$12$zmKvo4smXNj0aZXxjYTxQeLXtnQmT8qRbCUnNENcBMkxaiWnHZCsq', 2, 3, 7, NOW()),
+('Sophia', 'Morgan', 'sophia.morgan@company.com', 'smorgan', '$2y$12$WGoiZ92pX/ZGGP6trncCxOsk4USkBe634.Dy3UvNlaztlXodMvaOy', 4, 3, NULL, NOW()),
+('Lucas', 'Perry', 'lucas.perry@company.com', 'lperry', '$2y$12$TufS.PwsUDrcGQa2gNeOJegw8YsXhdkY0D1.RTJB33CPC7ZSPtsgq', 1, 3, 7, NOW()),
+('Natalie', 'Price', 'natalie.price@company.com', 'nprice', '$2y$12$zmKvo4smXNj0aZXxjYTxQeLXtnQmT8qRbCUnNENcBMkxaiWnHZCsq', 2, 3, 7, NOW()),
 
 -- IT (Dept 4)
-('Alexandru', 'Marin', 'alex.marin@company.com', 'amarin', '$2y$12$EMOxZSOrTH7JCEBcHntIM.YIwB0K5FnUQrmJiTiBnfH4KbKdyLOLq', 3, 4, NULL, NOW()),
-('Radu', 'Enache', 'radu.enache@company.com', 'renache', '$2y$12$ozArEdumVlsdChaoVO2cIunvL/NyQ4gzusdBm9ufAusF0qiNbOFIy', 1, 4, 10, NOW()),
-('Sorin', 'Istrate', 'sorin.istrate@company.com', 'sistrate', '$2y$12$BoRvTH5xWMOXWWAGdGOEZuht6ng20BKwqXnIcta1g0j0s11b5/FBu', 2, 4, 10, NOW()),
+('James', 'Cooper', 'james.cooper@company.com', 'jcooper', '$2y$12$EMOxZSOrTH7JCEBcHntIM.YIwB0K5FnUQrmJiTiBnfH4KbKdyLOLq', 3, 4, NULL, NOW()),
+('Ava', 'Richardson', 'ava.richardson@company.com', 'arichardson', '$2y$12$ozArEdumVlsdChaoVO2cIunvL/NyQ4gzusdBm9ufAusF0qiNbOFIy', 1, 4, 10, NOW()),
+('Benjamin', 'Ward', 'benjamin.ward@company.com', 'bward', '$2y$12$BoRvTH5xWMOXWWAGdGOEZuht6ng20BKwqXnIcta1g0j0s11b5/FBu', 2, 4, 10, NOW()),
 
 -- LEGAL (Dept 5)
-('Nicoleta', 'Barbu', 'nicoleta.barbu@company.com', 'nbarbu', '$2y$12$2ED3QkqTMA2iRv.Fe8g6ZOJR8Xs3IRC.7KwQKC/oqzJ2EW4o4kp16', 4, 5, NULL, NOW()),
-('Laura', 'Ilie', 'laura.ilie@company.com', 'lilie', '$2y$12$SR5fmrEf3nWLCyBC0BCEA.LoUlHma8ZHYF4JrPndedKUaPmcjXJEu', 1, 5, 13, NOW()),
-('Diana', 'Toma', 'diana.toma@company.com', 'dtoma', '$2y$12$K3OCIu1P6ALg1x6lfucAZOzLFFZDOfZR5nUmuMeDuv0ay0wN6zbo.', 2, 5, 13, NOW()),
+('Emily', 'Hughes', 'emily.hughes@company.com', 'ehughes', '$2y$12$2ED3QkqTMA2iRv.Fe8g6ZOJR8Xs3IRC.7KwQKC/oqzJ2EW4o4kp16', 4, 5, NULL, NOW()),
+('Samuel', 'Jenkins', 'samuel.jenkins@company.com', 'sjenkins', '$2y$12$SR5fmrEf3nWLCyBC0BCEA.LoUlHma8ZHYF4JrPndedKUaPmcjXJEu', 1, 5, 13, NOW()),
+('Chloe', 'Sanders', 'chloe.sanders@company.com', 'csanders', '$2y$12$K3OCIu1P6ALg1x6lfucAZOzLFFZDOfZR5nUmuMeDuv0ay0wN6zbo.', 2, 5, 13, NOW()),
 
 -- MARKETING (Dept 6)
-('Adrian', 'Mocanu', 'adrian.mocanu@company.com', 'amocanu', '$2y$12$jW7qUlU9up1a.nNHi6GyaOtoaG5ToVsUEW4wSl0VoFSHsPbGbRhZu', 6, 6, NULL, NOW()),
-('Bianca', 'Vasilescu', 'bianca.vasilescu@company.com', 'bvasilescu', '$2y$12$Fw0HhP6GZ91vrCWqwYYufO.aBKPc6dNg49gyIkKmC4EWqnJCvrrPm', 1, 6, 16, NOW()),
-('Georgiana', 'Stoica', 'georgiana.stoica@company.com', 'gstoica', '$2y$12$4R3uSlkFxlhR/kkKNjni1OLUqJIi4yHoOFo8EjQM7otg/JdxQS.4u', 2, 6, 16, NOW()),
+('Matthew', 'Ross', 'matthew.ross@company.com', 'mross', '$2y$12$jW7qUlU9up1a.nNHi6GyaOtoaG5ToVsUEW4wSl0VoFSHsPbGbRhZu', 6, 6, NULL, NOW()),
+('Lily', 'Powell', 'lily.powell@company.com', 'lpowell', '$2y$12$Fw0HhP6GZ91vrCWqwYYufO.aBKPc6dNg49gyIkKmC4EWqnJCvrrPm', 1, 6, 16, NOW()),
+('Alexander', 'Long', 'alexander.long@company.com', 'along', '$2y$12$4R3uSlkFxlhR/kkKNjni1OLUqJIi4yHoOFo8EjQM7otg/JdxQS.4u', 2, 6, 16, NOW()),
 
 -- OPERATIONS (Dept 7)
-('Florin', 'Sandu', 'florin.sandu@company.com', 'fsandu', '$2y$12$mW/cxXLx589daHP1apWc9u1jOnrzHUIyrPHvJSv6tdsfDWbGfy7Y.', 3, 7, NULL, NOW()),
-('Paul', 'Voicu', 'paul.voicu@company.com', 'pvoicu', '$2y$12$HgcAoWadK.amSU/O4CKF4OQ2Q0s171XazYqA.xMeUi4MFSD/B6ony', 1, 7, 19, NOW()),
-('Robert', 'Cojocaru', 'robert.cojocaru@company.com', 'rcojocaru', '$2y$12$46dGHLJCauV2ORrGMzjOxuZ7X49vLQ0iuTy6OxmwhY4wE8AZQCl4.', 2, 7, 19, NOW()),
+('Victoria', 'Butler', 'victoria.butler@company.com', 'vbutler', '$2y$12$mW/cxXLx589daHP1apWc9u1jOnrzHUIyrPHvJSv6tdsfDWbGfy7Y.', 3, 7, NULL, NOW()),
+('Daniel', 'Murphy', 'daniel.murphy@company.com', 'dmurphy', '$2y$12$HgcAoWadK.amSU/O4CKF4OQ2Q0s171XazYqA.xMeUi4MFSD/B6ony', 1, 7, 19, NOW()),
+('Zoe', 'Simmons', 'zoe.simmons@company.com', 'zsimmons', '$2y$12$46dGHLJCauV2ORrGMzjOxuZ7X49vLQ0iuTy6OxmwhY4wE8AZQCl4.', 2, 7, 19, NOW()),
 
 -- SALES (Dept 8)
-('George', 'Luca', 'george.luca@company.com', 'gluca', '$2y$12$qRHuCa8uu3YpuXx.eCM/7.ei5F6hPJ3KMwSuPkNSZ1A6cIwT8Ln.y', 6, 8, NULL, NOW()),
-('Marius', 'Dinu', 'marius.dinu@company.com', 'mdinu', '$2y$12$cfRrcAeNZiaeEU8K06dWOuk3emXrg6IrJq.Pw8upidl9DeDz7zFnS', 1, 8, 22, NOW()),
-('Andrei', 'Serban', 'andrei.serban@company.com', 'aserban', '$2y$12$8f3UdiuicxMTtyew3y6Rxefiu5hYrleqh21EUDpKeBqRdT4LrV0za', 2, 8, 22, NOW()),
+('Christopher', 'Bailey', 'christopher.bailey@company.com', 'cbailey', '$2y$12$qRHuCa8uu3YpuXx.eCM/7.ei5F6hPJ3KMwSuPkNSZ1A6cIwT8Ln.y', 6, 8, NULL, NOW()),
+('Hannah', 'Coleman', 'hannah.coleman@company.com', 'hcoleman', '$2y$12$cfRrcAeNZiaeEU8K06dWOuk3emXrg6IrJq.Pw8upidl9DeDz7zFnS', 1, 8, 22, NOW()),
+('Jack', 'Peterson', 'jack.peterson@company.com', 'jpeterson', '$2y$12$8f3UdiuicxMTtyew3y6Rxefiu5hYrleqh21EUDpKeBqRdT4LrV0za', 2, 8, 22, NOW()),
 
 -- SUPPORT (Dept 9)
-('Oana', 'Chiriac', 'oana.chiriac@company.com', 'ochiriac', '$2y$12$NfVPdum5I5oHKtcCOjsKku5xXyg0q9IF4eJLc5GBPqCEh00d7s9ai', 3, 9, NULL, NOW()),
-('Catalin', 'Neagu', 'catalin.neagu@company.com', 'cneagu', '$2y$12$lql0KMK36nlYdojqeuvezOQNXz5qc0ijDsuvFuJxu2GStZpg3o992', 1, 9, 25, NOW()),
-('Florentina', 'Ivan', 'florentina.ivan@company.com', 'fivan', '$2y$12$4e.5IXij6TkFAN16STdYGuTnW/Bjq.OYcnBZVpnx8V7XTiiOxvqtq', 2, 9, 25, NOW());
+('Madison', 'Reed', 'madison.reed@company.com', 'mreed', '$2y$12$NfVPdum5I5oHKtcCOjsKku5xXyg0q9IF4eJLc5GBPqCEh00d7s9ai', 3, 9, NULL, NOW()),
+('Ryan', 'Kelly', 'ryan.kelly@company.com', 'rkelly', '$2y$12$lql0KMK36nlYdojqeuvezOQNXz5qc0ijDsuvFuJxu2GStZpg3o992', 1, 9, 25, NOW()),
+('Abigail', 'Turner', 'abigail.turner@company.com', 'aturner', '$2y$12$4e.5IXij6TkFAN16STdYGuTnW/Bjq.OYcnBZVpnx8V7XTiiOxvqtq', 2, 9, 25, NOW());

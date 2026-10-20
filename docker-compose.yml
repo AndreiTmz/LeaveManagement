@@ -9,7 +9,9 @@ services:
     ports:
       - "8000:80"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    command: sh -c "composer install --no-interaction --prefer-dist --optimize-autoloader && apache2-foreground"
 
   db:
     image: mysql:8.0
@@ -25,6 +27,12 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./database:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -h localhost -u$$MYSQL_USER -p$$MYSQL_PASSWORD $$MYSQL_DATABASE -e 'SELECT 1 FROM employees LIMIT 1'"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
