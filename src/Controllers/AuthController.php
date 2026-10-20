@@ -21,18 +21,18 @@ class AuthController extends BaseController
 
     public function login(): void
     {
-        $email = $_POST['email'] ?? '';
-        $password = $_POST['password'] ?? '';
+        $identifier = is_string($_POST['identifier'] ?? null) ? $_POST['identifier'] : '';
+        $password = is_string($_POST['password'] ?? null) ? $_POST['password'] : '';
 
         //attempt authentication
-        if ($this->authService->attempt($email, $password)) {
+        if ($this->authService->attempt($identifier, $password)) {
             session_regenerate_id(true);
             header('Location: /calendar');
             exit;
         }
 
         //auth failed. return to login page with error message
-        $this->showLoginForm($email, 'Invalid credentials. Please try again.');
+        $this->showLoginForm($identifier, 'Invalid credentials. Please try again.');
     }
 
     public function logout(): void
@@ -88,13 +88,13 @@ class AuthController extends BaseController
         ]);
     }
 
-    private function showLoginForm(string $email = '', string $errorMessage = ''): void
+    private function showLoginForm(string $identifier = '', string $errorMessage = ''): void
     {
         $this->view('auth/login', [
             'title' => 'Login',
             'styles' => ['/css/forms.css'],
             'scripts' => ['/js/password-visibility.js'],
-            'email' => $email,
+            'identifier' => $identifier,
             'errorMessage' => $errorMessage,
         ], 'guest');
     }

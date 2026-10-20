@@ -58,6 +58,9 @@ class EmployeeService
         if (!$this->employeeRepository->positionExists($positionId)) {
             throw new \InvalidArgumentException('Select an available position.');
         }
+        if ($this->employeeRepository->emailExists($email)) {
+            throw new \DomainException('That email address is already in use.');
+        }
         if ($this->employeeRepository->usernameExists($username)) {
             throw new \DomainException('That username is already in use.');
         }

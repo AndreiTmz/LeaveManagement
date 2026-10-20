@@ -53,7 +53,12 @@ These credentials are for the local development setup only.
 
 ### Sign in
 
-The database seed creates example manager and employee accounts. Sign in with an account's email address and password. The seed stores password hashes rather than documenting plaintext passwords; use credentials available to you for the seeded accounts.
+The database seed creates example manager and employee accounts. Sign in with either an account's email address or username.
+
+| Role | Email | Username | Password |
+| --- | --- | --- | --- |
+| Manager | `andreea.radu@company.com` | `aradu` | `Password123!` |
+| Employee | `elena.stan@company.com` | `estan` | `Password123!` |
 
 New employees created from the manager menu are assigned the initial password `Password123!`. They should change it after their first sign-in.
 

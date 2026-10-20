@@ -10,9 +10,9 @@ class AuthService
         private EmployeeRepository $employeeRepository
     ) {}
 
-    public function attempt(string $username, string $password): bool
+    public function attempt(string $identifier, string $password): bool
     {
-        $user = $this->employeeRepository->findByEmail($username);
+        $user = $this->employeeRepository->findByLoginIdentifier($identifier);
 
         if (!$user) {
             return false;

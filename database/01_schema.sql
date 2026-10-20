@@ -125,6 +125,7 @@ ALTER TABLE `departments`
 --
 ALTER TABLE `employees`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`),
   ADD UNIQUE KEY `username` (`username`),
   ADD KEY `position_id` (`position_id`),
   ADD KEY `department_id` (`department_id`),

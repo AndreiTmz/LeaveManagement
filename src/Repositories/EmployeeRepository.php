@@ -39,6 +39,14 @@ class EmployeeRepository
         return $stmt->fetchColumn() !== false;
     }
 
+    public function emailExists(string $email): bool
+    {
+        $stmt = $this->pdo->prepare('SELECT 1 FROM employees WHERE email = :email');
+        $stmt->execute(['email' => $email]);
+
+        return $stmt->fetchColumn() !== false;
+    }
+
     public function positionExists(int $positionId): bool
     {
         $stmt = $this->pdo->prepare('SELECT 1 FROM positions WHERE id = :position_id');
@@ -77,17 +85,24 @@ class EmployeeRepository
             ]);
         } catch (\PDOException $exception) {
             if ($exception->getCode() === '23000' && (int) ($exception->errorInfo[1] ?? 0) === 1062) {
-                throw new \DomainException('That username is already in use.', 0, $exception);
+                throw new \DomainException('That email address or username is already in use.', 0, $exception);
             }
 
             throw $exception;
         }
     }
 
-    public function findByEmail(string $email): ?Employee
+    public function findByLoginIdentifier(string $identifier): ?Employee
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM employees WHERE email = ?");
-        $stmt->execute([$email]);
+        $stmt = $this->pdo->prepare('SELECT * FROM employees
+            WHERE email = :email OR username = :username
+            ORDER BY (email = :preferred_email) DESC
+            LIMIT 1');
+        $stmt->execute([
+            'email' => $identifier,
+            'username' => $identifier,
+            'preferred_email' => $identifier,
+        ]);
 
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 

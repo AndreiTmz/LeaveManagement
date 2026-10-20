@@ -9,9 +9,9 @@
                 <?= csrf_field() ?>
 
                 <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input class="form-control" type="email" name="email" required
-                        value="<?= htmlspecialchars($email ?? '') ?>">
+                    <label class="form-label" for="login-identifier">Email or username</label>
+                    <input class="form-control" id="login-identifier" type="text" name="identifier" autocomplete="username" required
+                        value="<?= htmlspecialchars($identifier ?? '', ENT_QUOTES, 'UTF-8') ?>">
                 </div>
 
                 <div class="mb-3">
