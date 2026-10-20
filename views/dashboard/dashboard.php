@@ -161,6 +161,9 @@
                         }
                     }
                 },
+                buttonText: {
+                    today: 'Today'
+                },
                 eventClick: function (info) {
                     const event = info.event;
                     const details = event.extendedProps;

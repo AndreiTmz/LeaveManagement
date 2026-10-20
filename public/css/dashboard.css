@@ -208,6 +208,15 @@
     cursor: pointer;
 }
 
+#calendar a {
+    color: var(--text);
+    text-decoration: none;
+}
+
+#calendar thead tr[role="row"] {
+    background-color: var(--background);
+}
+
 .leave-event-dialog {
     width:min(540px, calc(100% - 32px));
     max-height:calc(100% - 32px);
