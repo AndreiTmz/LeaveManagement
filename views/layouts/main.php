@@ -11,9 +11,6 @@
                 </div>
 
                 <div class="d-flex align-items-center gap-2">
-                    <?php if (($_SESSION['is_manager'] ?? false) === true && empty($hideAddEmployeeButton)): ?>
-                        <a class="btn calendar-action-button" href="/employees/add">Add employee</a>
-                    <?php endif; ?>
                     <form method="POST" action="/logout">
                         <?= csrf_field() ?>
                         <button class="btn btn-outline-dark">
@@ -31,28 +28,33 @@
             <?php endif; ?>
         </main>
 
-        <details class="settings-menu">
-            <summary class="settings-menu-toggle" aria-label="Open settings" title="Settings">
-                <i class="fa-solid fa-gear" aria-hidden="true"></i>
+        <details class="context-menu">
+            <summary class="context-menu-toggle" aria-label="Open menu" title="Menu">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
             </summary>
-            <nav class="settings-menu-popover" aria-label="Settings">
-                <a href="/change-password">Change password</a>
+            <nav class="context-menu-popover" aria-label="Menu">
+                <?php if (($_SESSION['is_manager'] ?? false) === true && empty($hideAddEmployeeButton)): ?>
+                    <a href="/employees/add">Add employee</a>
+                <?php endif; ?>
+                <?php if (($title ?? '') !== 'Change password'): ?>
+                    <a href="/change-password">Change password</a>
+                <?php endif; ?>
             </nav>
         </details>
 
         <script>
             (() => {
-                const settingsMenu = document.querySelector('.settings-menu');
+                const contextMenu = document.querySelector('.context-menu');
 
                 document.addEventListener('click', (event) => {
-                    if (settingsMenu.open && !settingsMenu.contains(event.target)) {
-                        settingsMenu.open = false;
+                    if (contextMenu.open && !contextMenu.contains(event.target)) {
+                        contextMenu.open = false;
                     }
                 });
 
                 document.addEventListener('keydown', (event) => {
                     if (event.key === 'Escape') {
-                        settingsMenu.open = false;
+                        contextMenu.open = false;
                     }
                 });
             })();
