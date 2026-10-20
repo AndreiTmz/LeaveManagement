@@ -19,8 +19,14 @@ class LeaveService
         foreach ($leaves as $leave) {
             $isManager = $leave->viewer_manager_id === null;
             $sameDepartment = (int) $leave->viewer_department_id === (int) $leave->department_id;
-            $createdByAnotherDepartmentManager = $leave->creator_manager_id === null
-                && (int) $leave->creator_department_id !== (int) $leave->department_id;
+            $isAnotherEmployee = (int) $leave->employee_id !== $viewerId;
+            $requestIsFromAnotherManager = $leave->employee_manager_id === null && $isAnotherEmployee;
+            $canDecide = $isManager && $isAnotherEmployee && ($sameDepartment || $requestIsFromAnotherManager);
+
+            if ($isManager && strtolower($leave->status) === 'pending' && !$canDecide) {
+                continue;
+            }
+
             $events[] = [
                 'id' => (string) $leave->id,
                 'title' => $leave->employee_first_name . ' ' . $leave->employee_last_name,
@@ -42,7 +48,7 @@ class LeaveService
                 'approved_by' => $leave->approver_first_name !== null
                     ? $leave->approver_first_name . ' ' . $leave->approver_last_name
                     : null,
-                'can_decide' => $isManager && ($sameDepartment || $createdByAnotherDepartmentManager),
+                'can_decide' => $canDecide,
                 'classNames' => match (strtolower($leave->status)) {
                     'pending' => ['pending-leave-request'],
                     'rejected' => ['rejected-leave-request'],
@@ -53,6 +59,20 @@ class LeaveService
         }
 
         return $events;
+    }
+
+    public function getPendingRequestCounts(int $viewerId, string $month): array
+    {
+        if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $month)) {
+            throw new \InvalidArgumentException('Choose a valid calendar month.');
+        }
+
+        $monthStart = $month . '-01';
+        $nextMonthStart = (new \DateTimeImmutable($monthStart))
+            ->modify('first day of next month')
+            ->format('Y-m-d');
+
+        return $this->leaveRepository->fetchPendingRequestCounts($viewerId, $monthStart, $nextMonthStart);
     }
 
     public function decideLeaveRequest(int $managerId, int $leaveId, string $decision): string

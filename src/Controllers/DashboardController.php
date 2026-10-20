@@ -16,8 +16,26 @@ class DashboardController extends BaseController
             'title' => 'Dashboard',
             'styles' => ['/css/dashboard.css'],
             'remainingLeave' => $this->leaveService->getRemainingLeaveDays((int) $_SESSION['user_id']),
-            'leaveRequests' => $this->leaveService->getEmployeeRequestsForCurrentYear((int) $_SESSION['user_id'])
+            'leaveRequests' => $this->leaveService->getEmployeeRequestsForCurrentYear((int) $_SESSION['user_id']),
+            'isManager' => ($_SESSION['is_manager'] ?? false) === true,
         ]);
+    }
+
+    public function getPendingRequestCounts(): void
+    {
+        $this->requireAuth();
+
+        $month = is_string($_GET['month'] ?? null) ? $_GET['month'] : '';
+        try {
+            $counts = $this->leaveService->getPendingRequestCounts((int) $_SESSION['user_id'], $month);
+        } catch (\InvalidArgumentException $exception) {
+            http_response_code(422);
+            $counts = ['error' => $exception->getMessage()];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($counts, JSON_THROW_ON_ERROR);
+        exit;
     }
 
     public function getLeaveEvents(): void 

@@ -38,6 +38,7 @@ $router->post('/employees/add', [$container->get(EmployeeController::class), 'ad
 
 $router->get('/calendar', [$container->get(DashboardController::class), 'index']);
 $router->get('/calendar/leaves', [$container->get(DashboardController::class), 'getLeaveEvents']);
+$router->get('/calendar/pending-counts', [$container->get(DashboardController::class), 'getPendingRequestCounts']);
 $router->post('/calendar/leave-decision', [$container->get(DashboardController::class), 'decideLeaveRequest']);
 
 $router->get('/leaves/request', [$container->get(LeaveController::class), 'showRequestLeave']);

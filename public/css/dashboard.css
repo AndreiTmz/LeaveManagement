@@ -196,6 +196,33 @@
     background: var(--primary-hover);
 }
 
+#calendar .fc-prev-button,
+#calendar .fc-next-button {
+    position:relative;
+}
+
+.calendar-pending-badge {
+    position:absolute;
+    top:-7px;
+    right:-7px;
+    display:grid;
+    min-width:18px;
+    height:18px;
+    padding:0 4px;
+    place-items:center;
+    border:2px solid var(--surface);
+    border-radius:999px;
+    background:#a63737;
+    color:#fff;
+    font-size:.68rem;
+    font-weight:700;
+    line-height:1;
+}
+
+.calendar-pending-badge[hidden] {
+    display:none;
+}
+
 #calendar .pending-leave-request {
     opacity:.5;
 }

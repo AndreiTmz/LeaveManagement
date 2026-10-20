@@ -20,6 +20,8 @@ class LeaveRepository
                 l.created_at,
                 e.first_name AS employee_first_name,
                 e.last_name AS employee_last_name,
+                e.id AS employee_id,
+                e.manager_id AS employee_manager_id,
                 p.name AS employee_position,
                 e.department_id,
                 d.name AS department_name,
@@ -49,6 +51,34 @@ class LeaveRepository
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    public function fetchPendingRequestCounts(int $viewerId, string $monthStart, string $nextMonthStart): array
+    {
+        $stmt = $this->pdo->prepare("SELECT
+                SUM(CASE WHEN l.start_date < :month_start THEN 1 ELSE 0 END) AS previous_count,
+                SUM(CASE WHEN l.start_date >= :next_month_start THEN 1 ELSE 0 END) AS next_count
+            FROM leaves l
+            JOIN employees employee ON employee.id = l.employee_id
+            JOIN employees viewer ON viewer.id = :viewer_id
+            WHERE LOWER(l.status) = 'pending'
+                AND viewer.manager_id IS NULL
+                AND employee.id <> viewer.id
+                AND (
+                    employee.department_id = viewer.department_id
+                    OR employee.manager_id IS NULL
+                )");
+        $stmt->execute([
+            'month_start' => $monthStart,
+            'next_month_start' => $nextMonthStart,
+            'viewer_id' => $viewerId,
+        ]);
+
+        $counts = $stmt->fetch(PDO::FETCH_ASSOC);
+        return [
+            'previous' => (int) ($counts['previous_count'] ?? 0),
+            'next' => (int) ($counts['next_count'] ?? 0),
+        ];
+    }
+
     public function decideLeaveRequest(int $managerId, int $leaveId, string $decision): string
     {
         $this->pdo->beginTransaction();
@@ -56,14 +86,13 @@ class LeaveRepository
         try {
             $stmt = $this->pdo->prepare("SELECT
                     l.status,
+                    employee.id AS request_employee_id,
                     employee.department_id AS request_department_id,
-                    creator.department_id AS creator_department_id,
-                    creator.manager_id AS creator_manager_id,
+                    employee.manager_id AS request_employee_manager_id,
                     manager.department_id AS manager_department_id,
                     manager.manager_id AS manager_manager_id
                 FROM leaves l
                 JOIN employees employee ON employee.id = l.employee_id
-                JOIN employees creator ON creator.id = l.created_by_id
                 JOIN employees manager ON manager.id = :manager_id
                 WHERE l.id = :leave_id
                 FOR UPDATE");
@@ -79,9 +108,11 @@ class LeaveRepository
 
             $isManager = $leave['manager_manager_id'] === null;
             $sameDepartment = (int) $leave['manager_department_id'] === (int) $leave['request_department_id'];
-            $createdByAnotherDepartmentManager = $leave['creator_manager_id'] === null
-                && (int) $leave['creator_department_id'] !== (int) $leave['request_department_id'];
-            if (!$isManager || (!$sameDepartment && !$createdByAnotherDepartmentManager)) {
+            $requestIsFromAnotherManager = $leave['request_employee_manager_id'] === null
+                && (int) $leave['request_employee_id'] !== $managerId;
+            if (!$isManager || (int) $leave['request_employee_id'] === $managerId
+                || (!$sameDepartment && !$requestIsFromAnotherManager)
+            ) {
                 throw new \DomainException('You are not authorized to decide this leave request.');
             }
 

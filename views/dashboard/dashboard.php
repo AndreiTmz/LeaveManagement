@@ -1,4 +1,4 @@
-<div class="dashboard">
+<div class="dashboard" data-manager="<?= !empty($isManager) ? 'true' : 'false' ?>">
     <div class="dashboard-summary">
         <div class="summary-card">
             <?php $leaveBalances = $remainingLeave ?? []; ?>
@@ -119,6 +119,8 @@
         const leaveActions = document.getElementById('leave-event-actions');
         const leaveMessage = document.getElementById('leave-event-message');
         const decisionForm = document.getElementById('leave-decision-form');
+        const dashboard = document.querySelector('.dashboard');
+        const isManager = dashboard.dataset.manager === 'true';
 
         const setLeaveDetail = function (name, value) {
             document.getElementById(`leave-event-${name}`).textContent = value || 'Not specified';
@@ -139,6 +141,47 @@
                 if (date.getDay() !== 0 && date.getDay() !== 6) days++;
             }
             return days;
+        };
+
+        let pendingCountRequest = 0;
+        const updatePendingBadges = async function (date) {
+            if (!isManager) return;
+
+            const requestId = ++pendingCountRequest;
+            const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            const response = await fetch(`/calendar/pending-counts?month=${encodeURIComponent(month)}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const counts = await response.json();
+            if (!response.ok) {
+                throw new Error(counts.error || 'Unable to load pending leave request counts.');
+            }
+            if (requestId !== pendingCountRequest) return;
+
+            [
+                ['.fc-prev-button', counts.previous, 'earlier'],
+                ['.fc-next-button', counts.next, 'later']
+            ].forEach(function ([selector, count, direction]) {
+                const button = document.querySelector(`#calendar ${selector}`);
+                if (!button) return;
+
+                let badge = button.querySelector('.calendar-pending-badge');
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'calendar-pending-badge';
+                    badge.setAttribute('aria-hidden', 'true');
+                    button.appendChild(badge);
+                }
+                badge.textContent = count > 0 ? String(count) : '';
+                badge.hidden = count < 1;
+                button.setAttribute(
+                    'aria-label',
+                    `${direction === 'earlier' ? 'Previous' : 'Next'} month${count > 0 ? `, ${count} pending review request${count === 1 ? '' : 's'} ${direction}` : ''}`
+                );
+                button.title = count > 0
+                    ? `${count} pending review request${count === 1 ? '' : 's'} ${direction}`
+                    : `${direction === 'earlier' ? 'Previous' : 'Next'} month`;
+            });
         };
 
         const calendar = new FullCalendar.Calendar(
@@ -163,6 +206,11 @@
                 },
                 buttonText: {
                     today: 'Today'
+                },
+                datesSet: function (info) {
+                    updatePendingBadges(info.view.currentStart).catch(function (error) {
+                        console.error(error);
+                    });
                 },
                 eventClick: function (info) {
                     const event = info.event;
@@ -234,6 +282,9 @@
                 leaveMessage.textContent = `Leave request ${result.status.toLowerCase()}.`;
                 leaveActions.hidden = true;
                 calendar.refetchEvents();
+                updatePendingBadges(calendar.getDate()).catch(function (error) {
+                    console.error(error);
+                });
             } catch (error) {
                 leaveMessage.textContent = error.message;
                 leaveActions.querySelectorAll('button').forEach(action => {
