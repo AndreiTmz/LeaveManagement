@@ -65,7 +65,7 @@ INSERT INTO employees
 VALUES
 
 -- ADMINISTRATION (Dept 1)
-('Oliver', 'Bennett', 'oliver.bennett@company.com', 'obennett', '$2y$12$EMENhLIwA9mcbNSVBcnqaumoaJZnwumLuXn9gSxYEl4YnP4JCDH1G', 3, 1, NULL, NOW()),
+('Oliver', 'Bennett', 'oliver.bennett@company.com', 'obennett', '$2y$12$fTbmEEQYrPMdw0eQjcDwuOKX5n/pQMfXxz9kqCICr2RjCGIs2SwpS', 3, 1, NULL, NOW()),
 ('Amelia', 'Carter', 'amelia.carter@company.com', 'acarter', '$2y$12$KULCrij4oY63GKoSwbnSCu0F.nJol31n.CrkssV.OGLIAXnCTa/4K', 1, 1, 1, NOW()),
 ('Henry', 'Walker', 'henry.walker@company.com', 'hwalker', '$2y$12$JjLRkmjxioWgZe6iwRgPte8zEamT8EjfDD2tmwoNI1/Mp2YpXm.YO', 2, 1, 1, NOW()),
 
