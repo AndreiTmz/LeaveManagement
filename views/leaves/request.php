@@ -79,6 +79,38 @@
                 ) ?>;
                 let latestRequest = 0;
 
+                function earliestAllowedDate() {
+                    const date = new Date();
+                    date.setHours(0, 0, 0, 0);
+                    let workingDays = 0;
+
+                    while (workingDays < 3) {
+                        date.setDate(date.getDate() + 1);
+                        if (date.getDay() !== 0 && date.getDay() !== 6) {
+                            workingDays++;
+                        }
+                    }
+
+                    return date;
+                }
+
+                function formatDate(date) {
+                    return [
+                        date.getFullYear(),
+                        String(date.getMonth() + 1).padStart(2, '0'),
+                        String(date.getDate()).padStart(2, '0')
+                    ].join('-');
+                }
+
+                function minimumDateFor(input) {
+                    const earliest = earliestAllowedDate();
+                    if (input !== endDate || !startDate.value || startDate.value < formatDate(earliest)) {
+                        return earliest;
+                    }
+
+                    return new Date(startDate.value + 'T00:00:00');
+                }
+
                 function initializeWeekdayPicker(input) {
                     input.type = 'text';
                     input.readOnly = true;
@@ -90,13 +122,10 @@
                     picker.className = 'weekday-picker';
                     picker.hidden = true;
                     picker.setAttribute('role', 'dialog');
-                    picker.setAttribute('aria-label', 'Choose a weekday');
+                    picker.setAttribute('aria-label', 'Choose an available leave date');
                     input.insertAdjacentElement('afterend', picker);
 
-                    let visibleMonth = input.value
-                        ? new Date(input.value + 'T00:00:00')
-                        : new Date();
-                    visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1);
+                    let visibleMonth;
 
                     function closePicker() {
                         picker.hidden = true;
@@ -112,7 +141,16 @@
                         previous.type = 'button';
                         previous.textContent = 'Previous';
                         previous.setAttribute('aria-label', 'Previous month');
+                        const minimumDate = minimumDateFor(input);
+                        previous.disabled = visibleMonth <= new Date(
+                            minimumDate.getFullYear(),
+                            minimumDate.getMonth(),
+                            1
+                        );
                         previous.addEventListener('click', () => {
+                            if (previous.disabled) {
+                                return;
+                            }
                             visibleMonth.setMonth(visibleMonth.getMonth() - 1);
                             renderPicker();
                         });
@@ -134,14 +172,14 @@
 
                         const grid = document.createElement('div');
                         grid.className = 'weekday-picker-grid';
-                        for (const dayName of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']) {
+                        for (const dayName of ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']) {
                             const dayLabel = document.createElement('span');
                             dayLabel.className = 'weekday-picker-label';
                             dayLabel.textContent = dayName;
                             grid.append(dayLabel);
                         }
 
-                        const firstWeekday = visibleMonth.getDay();
+                        const firstWeekday = (visibleMonth.getDay() + 6) % 7;
                         for (let blank = 0; blank < firstWeekday; blank++) {
                             grid.append(document.createElement('span'));
                         }
@@ -159,14 +197,15 @@
                             const dateButton = document.createElement('button');
                             dateButton.type = 'button';
                             dateButton.textContent = String(day);
-                            dateButton.disabled = date.getDay() === 0 || date.getDay() === 6;
+                            dateButton.disabled = date < minimumDate
+                                || date.getDay() === 0
+                                || date.getDay() === 6;
                             dateButton.setAttribute('aria-label', date.toLocaleDateString());
                             dateButton.addEventListener('click', () => {
-                                input.value = [
-                                    date.getFullYear(),
-                                    String(date.getMonth() + 1).padStart(2, '0'),
-                                    String(date.getDate()).padStart(2, '0')
-                                ].join('-');
+                                if (dateButton.disabled) {
+                                    return;
+                                }
+                                input.value = formatDate(date);
                                 closePicker();
                                 input.dispatchEvent(new Event('change', { bubbles: true }));
                             });
@@ -178,9 +217,13 @@
                     input.addEventListener('click', () => {
                         if (picker.hidden) {
                             const selectedDate = input.value ? new Date(input.value + 'T00:00:00') : null;
-                            visibleMonth = selectedDate && !Number.isNaN(selectedDate.getTime())
-                                ? new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1)
-                                : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+                            const minimumDate = minimumDateFor(input);
+                            const initialDate = selectedDate
+                                && !Number.isNaN(selectedDate.getTime())
+                                && selectedDate >= minimumDate
+                                ? selectedDate
+                                : minimumDate;
+                            visibleMonth = new Date(initialDate.getFullYear(), initialDate.getMonth(), 1);
                             renderPicker();
                             picker.hidden = false;
                             input.setAttribute('aria-expanded', 'true');
@@ -193,10 +236,12 @@
                             closePicker();
                         }
                     });
+
+                    return closePicker;
                 }
 
                 initializeWeekdayPicker(startDate);
-                initializeWeekdayPicker(endDate);
+                const closeEndDatePicker = initializeWeekdayPicker(endDate);
 
                 async function refreshReplacements() {
                     const requestId = ++latestRequest;
@@ -257,7 +302,11 @@
                 }
 
                 leaveType.addEventListener('change', refreshReplacements);
-                startDate.addEventListener('change', refreshReplacements);
+                startDate.addEventListener('change', () => {
+                    closeEndDatePicker();
+                    endDate.value = startDate.value;
+                    endDate.dispatchEvent(new Event('change', { bubbles: true }));
+                });
                 endDate.addEventListener('change', refreshReplacements);
                 refreshReplacements();
             })();
