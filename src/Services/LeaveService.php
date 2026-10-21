@@ -23,7 +23,7 @@ class LeaveService
             $requestIsFromAnotherManager = $leave->employee_manager_id === null && $isAnotherEmployee;
             $canDecide = $isManager && $isAnotherEmployee && ($sameDepartment || $requestIsFromAnotherManager);
 
-            if ($isManager && strtolower($leave->status) === 'pending' && !$canDecide) {
+            if ($isManager && $isAnotherEmployee && strtolower($leave->status) === 'pending' && !$canDecide) {
                 continue;
             }
 
