@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f3ef">
+    <meta name="description" content="A leave management app demo featuring employee requests, manager reviews, and a shared calendar.">
+    <title>Leave Management — Project Presentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="../public/css/main.css">
+    <link rel="stylesheet" href="../public/css/dashboard.css">
+    <link rel="stylesheet" href="../public/css/forms.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.21/index.global.min.js" defer></script>
+    <script src="calendar-preview.js" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="nav shell" aria-label="Main navigation">
+            <a class="brand" href="#" aria-label="Leave Management home">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 32 32" fill="none">
+                        <rect x="5" y="7" width="22" height="20" rx="5" stroke="currentColor" stroke-width="2"></rect>
+                        <path d="M10 4v6M22 4v6M5 13h22" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                        <path d="m12 19 2.5 2.5L21 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                </span>
+                <span>Leave Management</span>
+            </a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#workflow">How it works</a>
+                <a href="#demo">Demo</a>
+            </div>
+            <a class="button button-small button-outline" href="https://github.com/AndreiTmz/TimeOffManagement" target="_blank" rel="noreferrer">
+                View source
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4H4v12h12v-3M10 4h6v6M16 4l-8 8"></path></svg>
+            </a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero shell">
+            <div class="hero-copy">
+                <h1>Time off,<br><span>without the</span><br>back-and-forth.</h1>
+                <p class="hero-description">A simple leave management experience that brings employee requests, manager decisions, and the team calendar together.</p>
+                <div class="hero-actions">
+                    <a class="button button-primary" href="#features">
+                        Explore the project
+                        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M10 4l6 6-6 6"></path></svg>
+                    </a>
+                    <a class="text-link" href="https://github.com/AndreiTmz/TimeOffManagement" target="_blank" rel="noreferrer">Browse on GitHub <span aria-hidden="true">↗</span></a>
+                </div>
+                <div class="hero-meta">
+                    <span><i class="meta-dot php"></i> PHP 8.3</span>
+                    <span><i class="meta-dot mysql"></i> MySQL 8</span>
+                    <span><i class="meta-dot docker"></i> Docker Compose</span>
+                </div>
+            </div>
+
+            <div class="hero-visual app-example" aria-label="Preview of the leave calendar interface">
+                <div class="visual-orbit orbit-one"></div>
+                <div class="visual-orbit orbit-two"></div>
+                <div class="calendar-window">
+                    <header class="app-header">
+                        <div class="container app-header-content">
+                            <div>
+                                <h3>Leave Management</h3>
+                                <small>Welcome, Charlotte Hayes</small>
+                            </div>
+                            <button class="btn btn-outline-dark" type="button">Logout</button>
+                        </div>
+                    </header>
+                    <div class="container">
+                        <div class="dashboard dashboard-preview">
+                            <div id="calendar" aria-label="October 2026 team calendar"></div>
+                        </div>
+                    </div>
+                </div>
+                <p class="calendar-preview-note">Static preview using the app calendar, seeded demo employees, and illustrative leave requests.</p>
+            </div>
+        </section>
+
+        <section class="feature-section section shell" id="features">
+            <div class="section-heading">
+                <p class="eyebrow">A CLEARER WAY TO PLAN</p>
+                <h2>Everything in one<br><span>shared view.</span></h2>
+                <p>From checking a balance to reviewing a request, the essentials are easy to find and simple to use.</p>
+            </div>
+            <div class="feature-grid">
+                <article class="feature-card feature-card-wide">
+                    <div class="summary-card app-example feature-example">
+                        <div class="leave-carousel" aria-label="Remaining leave by type">
+                            <button class="leave-carousel-control" type="button" data-direction="-1" aria-label="Previous leave type" title="Previous" disabled>&larr;</button>
+                            <div class="leave-carousel-viewport">
+                                <div class="leave-carousel-track" aria-live="polite">
+                                    <div class="leave-carousel-slide" role="group" aria-roledescription="slide" aria-label="1 of 3">
+                                        <h3>Annual Leave</h3>
+                                        <p class="leave-balance-number">23</p>
+                                        <p class="leave-balance-caption">days remaining</p>
+                                    </div>
+                                    <div class="leave-carousel-slide" role="group" aria-roledescription="slide" aria-label="2 of 3">
+                                        <h3>Sick Leave</h3>
+                                        <p class="leave-balance-number">10</p>
+                                        <p class="leave-balance-caption">days remaining</p>
+                                    </div>
+                                    <div class="leave-carousel-slide" role="group" aria-roledescription="slide" aria-label="3 of 3">
+                                        <h3>Unpaid Leave</h3>
+                                        <p class="leave-balance-number">30</p>
+                                        <p class="leave-balance-caption">days remaining</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="leave-carousel-control" type="button" data-direction="1" aria-label="Next leave type" title="Next">&rarr;</button>
+                            <span class="leave-carousel-position" aria-hidden="true">1 / 3</span>
+                        </div>
+                    </div>
+                    <div class="feature-text">
+                        <span class="feature-number">01 / BALANCES</span>
+                        <h3>Know where you stand.</h3>
+                        <p>See remaining days by leave type and keep track of your own requests from the dashboard.</p>
+                    </div>
+                </article>
+                <article class="feature-card">
+                    <span class="feature-number">02 / TEAM CALENDAR</span>
+                    <h3>Make availability visible.</h3>
+                    <p>See approved time off at a glance, with request status and department colors in a shared calendar.</p>
+                    <div class="app-example">
+                        <dialog class="calendar-legend-dialog app-legend-preview" open aria-labelledby="preview-calendar-legend-title">
+                            <div class="calendar-legend-header">
+                                <div><h2 id="preview-calendar-legend-title">Leave request statuses</h2></div>
+                                <button class="calendar-legend-close" type="button" aria-label="Close" data-close-calendar-legend>
+                                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <p class="calendar-legend-intro">Each event’s color identifies its department. Its appearance shows the request status.</p>
+                            <ul class="calendar-legend-list">
+                                <li class="calendar-legend-item">
+                                    <span class="calendar-legend-example approved" aria-hidden="true">Employee name</span>
+                                    <span class="calendar-legend-description"><strong>Approved</strong><span>Confirmed leave; shown at full opacity.</span></span>
+                                    <i class="fa-solid fa-circle-check calendar-legend-status approved" aria-hidden="true"></i>
+                                </li>
+                                <li class="calendar-legend-item">
+                                    <span class="calendar-legend-example pending" aria-hidden="true">Employee name</span>
+                                    <span class="calendar-legend-description"><strong>Pending</strong><span>Waiting for a manager’s review; shown faded.</span></span>
+                                    <i class="fa-solid fa-clock calendar-legend-status pending" aria-hidden="true"></i>
+                                </li>
+                                <li class="calendar-legend-item">
+                                    <span class="calendar-legend-example rejected" aria-hidden="true">Employee name</span>
+                                    <span class="calendar-legend-description"><strong>Rejected</strong><span>Declined request; the event name is crossed out.</span></span>
+                                    <i class="fa-solid fa-circle-xmark calendar-legend-status rejected" aria-hidden="true"></i>
+                                </li>
+                            </ul>
+                        </dialog>
+                    </div>
+                </article>
+                <article class="feature-card">
+                    <span class="feature-number">03 / MANAGER REVIEWS</span>
+                    <h3>Keep decisions moving.</h3>
+                    <p>Managers can approve or reject eligible requests from the calendar and spot pending reviews as they browse.</p>
+                    <div class="manager-review-example app-example">
+                        <dialog class="leave-event-dialog app-review-dialog" open aria-labelledby="preview-leave-event-title">
+                            <div class="leave-event-dialog-header">
+                                <h2 id="preview-leave-event-title">Leave request</h2>
+                                <button type="button" class="leave-event-close" aria-label="Close">&times;</button>
+                            </div>
+                            <dl class="leave-event-details">
+                                <dt>Employee</dt><dd>Grace Foster</dd>
+                                <dt>Position</dt><dd>Senior Developer</dd>
+                                <dt>Department</dt><dd>Finance</dd>
+                                <dt>Leave type</dt><dd>Annual Leave</dd>
+                                <dt>Dates</dt><dd>October 26, 2026 – October 27, 2026</dd>
+                                <dt>Working days</dt><dd>2</dd>
+                                <dt>Status</dt><dd>Pending</dd>
+                                <dt>Requested</dt><dd>October 21, 2026</dd>
+                                <dt>Created by</dt><dd>Grace Foster</dd>
+                                <dt>Replacement</dt><dd>Ethan Brooks</dd>
+                                <dt>Approved by</dt><dd>Not approved</dd>
+                            </dl>
+                            <p class="leave-event-message" role="status" aria-live="polite"></p>
+                            <div class="leave-event-actions">
+                                <button type="button" class="leave-decision-button reject">Reject</button>
+                                <button type="button" class="leave-decision-button approve">Approve</button>
+                            </div>
+                        </dialog>
+                    </div>
+                </article>
+                <article class="feature-card">
+                    <span class="feature-number">04 / REQUESTS</span>
+                    <h3>Request time off with confidence.</h3>
+                    <p>Guided date selection and clear validation help employees submit complete requests fast and easily.</p>
+                    <div class="form-card app-example request-form-example">
+                        <h2 class="text-center mb-4">Request Leave</h2>
+                        <form>
+                            <div class="mb-3">
+                                <label class="form-label" for="preview-start-date">Start Date</label>
+                                <input class="form-control" id="preview-start-date" type="text" value="2026-10-26" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="preview-end-date">End Date</label>
+                                <input class="form-control" id="preview-end-date" type="text" value="2026-10-27" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="preview-leave-type">Leave type</label>
+                                <select class="form-control" id="preview-leave-type">
+                                    <option>Annual Leave</option>
+                                    <option>Sick Leave</option>
+                                    <option>Unpaid Leave</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="preview-replacement">Replacement employee</label>
+                                <select class="form-control" id="preview-replacement">
+                                    <option>Grace Foster</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary w-100 submit_btn" type="button">Request leave</button>
+                        </form>
+                    </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="workflow-section section" id="workflow">
+            <div class="shell workflow-layout">
+                <div class="section-heading">
+                    <p class="eyebrow">A SIMPLE FLOW</p>
+                    <h2>From request<br><span>to decision.</span></h2>
+                    <p>A small, straightforward workflow designed to keep the employee and manager experience connected.</p>
+                </div>
+                <ol class="steps">
+                    <li>
+                        <span class="step-number">01</span>
+                        <span class="step-line"></span>
+                        <div><h3>Check your balance</h3><p>Review available days and choose a leave type.</p></div>
+                    </li>
+                    <li>
+                        <span class="step-number">02</span>
+                        <span class="step-line"></span>
+                        <div><h3>Send a request</h3><p>Select dates, add a replacement when required, and submit.</p></div>
+                    </li>
+                    <li>
+                        <span class="step-number">03</span>
+                        <span class="step-line"></span>
+                        <div><h3>Review in the calendar</h3><p>Managers see pending reviews and open a request for details.</p></div>
+                    </li>
+                    <li>
+                        <span class="step-number">04</span>
+                        <span class="step-line step-line-last"></span>
+                        <div><h3>Keep everyone up to date</h3><p>The request status and team calendar reflect the decision.</p></div>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="demo-section section shell" id="demo">
+            <div class="demo-heading">
+                <div>
+                    <p class="eyebrow">TAKE A CLOSER LOOK</p>
+                    <h2>See the flow<br><span>in action.</span></h2>
+                </div>
+                <p>A short walkthrough. From cloning to running the project locally.</p>
+            </div>
+            <div class="video-placeholder">
+                <div class="video-grid" aria-hidden="true"></div>
+                <div class="play-button" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="m9 6 10 6-10 6V6Z"></path></svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="stack-section section">
+            <div class="shell stack-layout">
+                <div>
+                    <p class="eyebrow">UNDER THE HOOD</p>
+                    <h2>Built with a<br><span>practical stack.</span></h2>
+                </div>
+                <div class="stack-list">
+                    <span><b>PHP</b><small>8.3</small></span>
+                    <span><b>MySQL</b><small>8</small></span>
+                    <span><b>Docker</b><small>Compose</small></span>
+                    <span><b>FullCalendar</b><small>Calendar UI</small></span>
+                    <span><b>Bootstrap</b><small>UI utilities</small></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section section shell">
+            <div class="cta-card">
+                <div class="cta-decoration decoration-one"></div>
+                <div class="cta-decoration decoration-two"></div>
+                <div class="cta-copy">
+                    <p class="eyebrow">EXPLORE THE PROJECT</p>
+                    <h2>Good time off<br>starts with <span>good planning.</span></h2>
+                    <p>Explore the source, run the project locally, and see how the pieces fit together.</p>
+                    <div class="hero-actions">
+                        <a class="button button-light" href="https://github.com/AndreiTmz/TimeOffManagement" target="_blank" rel="noreferrer">
+                            Open the GitHub repo
+                            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M10 4l6 6-6 6"></path></svg>
+                        </a>
+                        <a class="cta-text-link" href="https://github.com/AndreiTmz/TimeOffManagement#run-locally" target="_blank" rel="noreferrer">Read setup instructions</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="shell footer-content">
+            <a class="brand footer-brand" href="#">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 32 32" fill="none"><rect x="5" y="7" width="22" height="20" rx="5" stroke="currentColor" stroke-width="2"></rect><path d="M10 4v6M22 4v6M5 13h22" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="m12 19 2.5 2.5L21 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </span>
+                <span>Leave Management</span>
+            </a>
+            <span class="footer-copy">A leave management project by Andrei T.</span>
+            <a class="footer-github" href="https://github.com/AndreiTmz/TimeOffManagement" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+        </div>
+    </footer>
+</body>
+</html>
