@@ -1,0 +1,359 @@
+.dashboard {
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+.dashboard-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:40px;
+}
+
+.dashboard-summary {
+    display:flex;
+    gap:20px;
+    margin-bottom:35px;
+}
+
+.summary-card {
+    position:relative;
+    flex:1;
+    background:var(--surface);
+    border-radius:16px;
+    padding:24px;
+    box-shadow:var(--shadow);
+}
+
+.summary-card h6 {
+    color:var(--text-light);
+    margin-bottom:10px;
+}
+
+.summary-card h3 {
+    font-size:2rem;
+    margin:0;
+}
+
+.leave-carousel {
+    position:relative;
+    display:grid;
+    grid-template-columns:minmax(0, 1fr);
+    grid-template-rows:minmax(118px, auto) auto;
+    align-items:center;
+}
+
+.leave-carousel.single-slide {
+    grid-template-rows:minmax(118px, auto);
+}
+
+.leave-carousel-viewport {
+    grid-column:1;
+    min-width:0;
+    padding:0 36px;
+    overflow:hidden;
+}
+
+.leave-carousel-track {
+    display:flex;
+    transition:transform 220ms ease;
+}
+
+.leave-carousel-slide {
+    flex:0 0 100%;
+    min-width:0;
+    text-align:center;
+}
+
+.leave-carousel-slide h3 {
+    overflow-wrap:anywhere;
+    font-size:1.1rem;
+}
+
+.leave-balance-number {
+    margin:4px 0 0;
+    color:var(--primary);
+    font-size:2.4rem;
+    font-weight:700;
+    line-height:1.1;
+}
+
+.leave-balance-caption {
+    margin:4px 0 0;
+    color:var(--text);
+    opacity:.68;
+    font-size:.9rem;
+}
+
+.leave-carousel-control {
+    position:absolute;
+    top:50%;
+    z-index:1;
+    display:grid;
+    width:36px;
+    height:40px;
+    place-items:center;
+    border:0;
+    border-radius:8px;
+    background:transparent;
+    color:var(--primary);
+    font-size:1.5rem;
+    line-height:1;
+    cursor:pointer;
+    transform:translateY(-50%);
+    transition:background-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.leave-carousel-control[data-direction="-1"] {
+    left:12px;
+}
+
+.leave-carousel-control[data-direction="1"] {
+    right:12px;
+}
+
+.leave-carousel-control:not(:disabled):hover {
+    background:rgba(138, 113, 87, .1);
+    color:var(--primary-hover);
+}
+
+.leave-carousel-control:not(:disabled):hover[data-direction="-1"] {
+    transform:translate(-2px, -50%);
+}
+
+.leave-carousel-control:not(:disabled):hover[data-direction="1"] {
+    transform:translate(2px, -50%);
+}
+
+.leave-carousel-control:focus-visible {
+    outline:2px solid var(--primary);
+    outline-offset:1px;
+}
+
+.leave-carousel-control:disabled {
+    color:var(--text);
+    opacity:.28;
+    cursor:default;
+}
+
+.leave-carousel-position {
+    grid-column:1;
+    justify-self:center;
+    color:var(--text);
+    opacity:.68;
+    font-size:.8rem;
+}
+
+.leave-balance-empty {
+    margin:0;
+    color:var(--text);
+    opacity:.68;
+}
+
+.request-carousel {
+    grid-template-rows:minmax(136px, auto) auto;
+}
+
+.request-carousel-slide h3 {
+    margin-bottom:8px;
+}
+
+.request-date-range {
+    margin:0;
+    font-size:1rem;
+    font-weight:600;
+}
+
+.request-submitted {
+    margin:6px 0 10px;
+    font-size:.85rem;
+    opacity:.7;
+}
+
+.request-status {
+    display:inline-block;
+    max-width:100%;
+    padding:4px 10px;
+    border:1px solid var(--border);
+    border-radius:4px;
+    overflow-wrap:anywhere;
+    font-size:.8rem;
+    text-transform:capitalize;
+}
+
+#calendar {
+    background:white;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:var(--shadow);
+}
+
+#calendar button {
+    background: var(--primary);
+}
+
+#calendar button:hover {
+    background: var(--primary-hover);
+}
+
+#calendar .fc-prev-button,
+#calendar .fc-next-button {
+    position:relative;
+}
+
+.calendar-pending-badge {
+    position:absolute;
+    top:-7px;
+    right:-7px;
+    display:grid;
+    min-width:18px;
+    height:18px;
+    padding:0 4px;
+    place-items:center;
+    border:2px solid var(--surface);
+    border-radius:999px;
+    background:#a63737;
+    color:#fff;
+    font-size:.68rem;
+    font-weight:700;
+    line-height:1;
+}
+
+.calendar-pending-badge[hidden] {
+    display:none;
+}
+
+#calendar .pending-leave-request {
+    opacity:.5;
+}
+
+#calendar .rejected-leave-request .fc-event-title {
+    text-decoration:line-through;
+}
+
+#calendar .fc-event {
+    cursor: pointer;
+}
+
+#calendar a {
+    color: var(--text);
+    text-decoration: none;
+}
+
+#calendar thead tr[role="row"] {
+    background-color: var(--background);
+}
+
+.leave-event-dialog {
+    width:min(540px, calc(100% - 32px));
+    max-height:calc(100% - 32px);
+    padding:24px;
+    border:1px solid var(--border);
+    border-radius:16px;
+    background:var(--surface);
+    color:var(--text);
+    box-shadow:var(--shadow);
+}
+
+.leave-event-dialog::backdrop {
+    background:rgba(20, 20, 20, .55);
+}
+
+.leave-event-dialog-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:18px;
+}
+
+.leave-event-dialog-header h2 {
+    margin:0;
+    font-size:1.4rem;
+}
+
+.leave-event-close {
+    border:0;
+    background:transparent;
+    color:var(--text);
+    font-size:1.7rem;
+    line-height:1;
+}
+
+.leave-event-details {
+    display:grid;
+    grid-template-columns:minmax(110px, .7fr) 1.3fr;
+    gap:10px 16px;
+    margin:0;
+}
+
+.leave-event-details dt {
+    color:var(--text);
+    opacity:.68;
+}
+
+.leave-event-details dd {
+    margin:0;
+    font-weight:600;
+    overflow-wrap:anywhere;
+}
+
+.leave-event-message {
+    min-height:1.5em;
+    margin:16px 0 0;
+}
+
+.leave-event-actions {
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:12px;
+}
+
+.leave-event-actions[hidden] {
+    display:none;
+}
+
+.leave-decision-button {
+    padding:8px 16px;
+    border:1px solid transparent;
+    border-radius:8px;
+    color:white;
+    cursor:pointer;
+}
+
+.leave-decision-button.approve {
+    background:#287a48;
+}
+
+.leave-decision-button.reject {
+    background:#a63737;
+}
+
+.leave-decision-button:disabled {
+    opacity:.6;
+    cursor:wait;
+}
+
+@media (max-width: 767px) {
+    .dashboard-summary {
+        flex-direction:column;
+    }
+
+    .summary-card {
+        width:100%;
+    }
+
+    .leave-event-dialog {
+        padding:20px;
+    }
+
+    .leave-event-details {
+        grid-template-columns:1fr;
+        gap:4px;
+    }
+
+    .leave-event-details dd {
+        margin-bottom:8px;
+    }
+}
