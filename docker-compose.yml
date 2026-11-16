@@ -16,7 +16,7 @@ services:
   db:
     image: mysql:8.0
     container_name: leave_db
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: leave_management
@@ -37,7 +37,7 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: leave_phpmyadmin
-    restart: always
+    restart: unless-stopped
     ports:
       - "8080:80"
     environment:
